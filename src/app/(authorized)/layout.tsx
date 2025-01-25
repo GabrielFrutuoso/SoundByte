@@ -6,6 +6,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Player } from "./Player/page";
+import { SideBar } from "@/components/SideBar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,7 +22,9 @@ export default function RootLayout({
     <html lang="pt-br">
       <body className="dark h-screen w-full flex flex-col">
         <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel defaultSize={20}>One</ResizablePanel>
+          <ResizablePanel minSize={15} defaultSize={15}>
+            <SideBar />
+          </ResizablePanel>
           <ResizableHandle />
           <ResizablePanel>{children}</ResizablePanel>
         </ResizablePanelGroup>

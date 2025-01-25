@@ -5,11 +5,12 @@ interface CurrentSongProps {
   songName: string;
   artist: string;
   cover: string;
+  key: string | number;
 }
 
-export const CurrentSong = ({ artist, songName, cover }: CurrentSongProps) => {
+export const CurrentSong = ({ artist, songName, cover, key }: CurrentSongProps) => {
   return (
-    <div className="flex items-center gap-4">
+    <div key={key} className="flex items-center gap-4">
       <Image
         className="rounded-lg"
         draggable={false}
@@ -18,7 +19,7 @@ export const CurrentSong = ({ artist, songName, cover }: CurrentSongProps) => {
         height={50}
         alt="Album cover"
       />
-      <div className="flex flex-col">
+      <div className="sm:hidden md:flex md:flex-col">
         <h1 className="text-xl font-bold">{songName}</h1>
         <p>{artist}</p>
       </div>
