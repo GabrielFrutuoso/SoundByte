@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
 import "../globals.css";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { Player } from "./Player/page";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,7 +19,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className="dark">{children}</body>
+      <body className="dark h-screen w-full flex flex-col">
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel defaultSize={20}>One</ResizablePanel>
+          <ResizableHandle />
+          <ResizablePanel>{children}</ResizablePanel>
+        </ResizablePanelGroup>
+        <Player />
+      </body>
     </html>
   );
 }
