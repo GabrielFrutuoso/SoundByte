@@ -2,12 +2,12 @@ import React from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import Link from "next/link";
 import { HomeIcon, Search, Settings } from "lucide-react";
-import { SongItem } from "../SongItem";
+import { PlaylistItem } from "../PlaylistItem";
 
 export const SideBar = () => {
   const fakeArray = Array.from({ length: 20 }, (_, i) => i);
   return (
-    <div className="flex flex-col p-4 gap-4">
+    <div className="flex flex-col p-4 gap-2">
       <ul className="flex flex-col gap-4 py-2">
         <li className="flex items-center gap-2">
           <HomeIcon />
@@ -22,11 +22,11 @@ export const SideBar = () => {
           <Link href="/">Configurações</Link>
         </li>
       </ul>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <h1 className="text-xl font-bold">Minhas Playlists</h1>
-        <ScrollArea className="h-[720px] w-full flex flex-col gap-4">
+        <ScrollArea className="h-[660px] w-full flex flex-col gap-4">
           {fakeArray.map((_, i) => (
-            <SongItem
+            <PlaylistItem
               key={i + "teste"}
               isPrivate={false}
               creator="Briel"
