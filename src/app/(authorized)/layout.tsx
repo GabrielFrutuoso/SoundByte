@@ -24,7 +24,7 @@ export default function RootLayout({
       <body className="dark h-screen w-full flex flex-col">
         <Header />
         <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel minSize={12} defaultSize={12}>
+          <ResizablePanel minSize={15} defaultSize={15}>
             <SideBar />
           </ResizablePanel>
           <ResizableHandle />
