@@ -5,7 +5,7 @@ export const baseStyle = tv({
   variants: {
     variant: {
       default: "border-none",
-      menu: "border border-zinc-800 rounded-lg",
+      menu: "border border-zinc-800 rounded-lg bg-zinc-900",
     },
   },
   defaultVariants: {
