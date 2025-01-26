@@ -1,8 +1,8 @@
 import React from "react";
 import { ScrollArea } from "../ui/scroll-area";
-import { CurrentSong } from "../CorrentSong";
 import Link from "next/link";
 import { HomeIcon, Search, Settings } from "lucide-react";
+import { SongItem } from "../SongItem";
 
 export const SideBar = () => {
   const fakeArray = Array.from({ length: 20 }, (_, i) => i);
@@ -26,9 +26,10 @@ export const SideBar = () => {
         <h1 className="text-xl font-bold">Minhas Playlists</h1>
         <ScrollArea className="h-[720px] w-full flex flex-col gap-4">
           {fakeArray.map((_, i) => (
-            <CurrentSong
+            <SongItem
               key={i + "teste"}
-              artist="Bring Me The Horizon"
+              isPrivate={false}
+              creator="Briel"
               songName="Kool-Aid"
               cover="https://imgs.search.brave.com/F90OQSQxVjf8lA6ErVlKAuCJYrK8RJptKdfEjsmFqpE/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvcHQvdGh1bWIv/Mi8yYy9Qb3N0X0h1/bWFuLV9OZXhfR2Vu/LnBuZy81MTJweC1Q/b3N0X0h1bWFuLV9O/ZXhfR2VuLnBuZw"
             />
