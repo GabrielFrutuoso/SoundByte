@@ -30,7 +30,7 @@ export const SideBar = () => {
               key={i + "teste"}
               isPrivate={false}
               creator="Briel"
-              songName="Kool-Aid"
+              songName="POST HUMAN: NeX GEn"
               cover="https://imgs.search.brave.com/F90OQSQxVjf8lA6ErVlKAuCJYrK8RJptKdfEjsmFqpE/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvcHQvdGh1bWIv/Mi8yYy9Qb3N0X0h1/bWFuLV9OZXhfR2Vu/LnBuZy81MTJweC1Q/b3N0X0h1bWFuLV9O/ZXhfR2VuLnBuZw"
             />
           ))}
