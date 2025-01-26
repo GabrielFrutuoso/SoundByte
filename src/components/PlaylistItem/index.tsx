@@ -7,7 +7,6 @@ interface PlaylistItemProps {
   isPrivate: boolean;
   creator: string;
   cover: string;
-  key: string | number;
   variant?: string;
   hideText?: boolean;
 }
@@ -16,12 +15,11 @@ export const PlaylistItem = ({
   songName,
   cover,
   creator,
-  key,
   variant,
   hideText,
 }: PlaylistItemProps & baseStyleProps) => {
   return (
-    <div key={key} className={baseStyle({ variant })}>
+    <div className={baseStyle({ variant })}>
       <Image
         className={` ${hideText && "w-16"} rounded-lg`}
         draggable={false}
