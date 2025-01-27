@@ -15,11 +15,11 @@ export const SideBar = () => {
         </li>
         <li className="flex items-center gap-2">
           <Search />
-          <Link href="/">Pesquisar</Link>
+          <Link href="/search">Pesquisar</Link>
         </li>
         <li className="flex items-center gap-2">
           <Settings />
-          <Link href="/">Configurações</Link>
+          <Link href="/settings">Configurações</Link>
         </li>
       </ul>
       <div className="flex flex-col gap-2">
