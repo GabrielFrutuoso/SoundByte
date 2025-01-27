@@ -36,6 +36,19 @@ export default function Home() {
             ))}
           </ul>
         </div>
+        <div className="flex flex-col gap-2 mt-12">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">Músicas nova na área!</h2>
+            <Link className="underline" href="/library">
+              Ver todas
+            </Link>
+          </div>
+          <ul className="grid grid-cols-6 gap-1">
+            {fakeArray2.map((_, i) => (
+              <SongItem key={i + "teste"} />
+            ))}
+          </ul>
+        </div>
       </ScrollArea>
     </main>
   );
