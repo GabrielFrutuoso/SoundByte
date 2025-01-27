@@ -4,7 +4,7 @@ import { SoundControls } from "@/components/SoundControls";
 import { Volume } from "lucide-react";
 import React from "react";
 
-export const Player = () => {
+export default function Player() {
   return (
     <div className="h-24 border-t border-zinc-800 flex items-center justify-around">
       <CurrentSong
