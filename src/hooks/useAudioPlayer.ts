@@ -4,7 +4,7 @@ export function useAudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
+  const [volume, setVolume] = useState(0.5);
   const [isLoading, setIsLoading] = useState(true);
 
   const audioRef = useRef<HTMLAudioElement>(null);
