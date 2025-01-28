@@ -7,20 +7,29 @@ import { PlaylistItem } from "../PlaylistItem";
 export const SideBar = () => {
   const fakeArray = Array.from({ length: 20 }, (_, i) => i);
   return (
-    <div className="flex flex-col p-4 gap-2">
-      <ul className="flex flex-col gap-4 py-2">
-        <li className="flex items-center gap-2">
+    <div className="flex flex-col p-4 gap-8">
+      <ul className="flex flex-col">
+        <Link
+          className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
+          href="/"
+        >
           <HomeIcon />
-          <Link href="/">Home</Link>
-        </li>
-        <li className="flex items-center gap-2">
+          Home
+        </Link>
+        <Link
+          className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
+          href="/search"
+        >
           <Search />
-          <Link href="/search">Pesquisar</Link>
-        </li>
-        <li className="flex items-center gap-2">
+          Pesquisar
+        </Link>
+        <Link
+          className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
+          href="/setting"
+        >
           <Settings />
-          <Link href="/settings">Configurações</Link>
-        </li>
+          Configurações
+        </Link>
       </ul>
       <div className="flex flex-col gap-2">
         <h1 className="text-xl font-bold">Minhas Playlists</h1>
