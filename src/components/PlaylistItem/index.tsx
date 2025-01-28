@@ -26,7 +26,7 @@ export const PlaylistItem = ({
           <Play />
         </button>
         <Image
-          className={` ${hideText && "w-16"} rounded-lg`}
+          className={` ${hideText && "w-16"} rounded-lg aspect-square object-cover`}
           draggable={false}
           src={cover}
           width={50}

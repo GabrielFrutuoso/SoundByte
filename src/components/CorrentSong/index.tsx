@@ -11,7 +11,7 @@ export const CurrentSong = ({ artist, songName, cover }: CurrentSongProps) => {
   return (
     <div className="flex items-center gap-4">
       <Image
-        className="rounded-lg"
+        className="rounded-lg aspect-square object-cover"
         draggable={false}
         src={cover}
         width={50}
