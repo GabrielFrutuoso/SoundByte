@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { Heart } from "lucide-react";
 
 interface CurrentSongProps {
   songName: string;
@@ -21,6 +22,9 @@ export const CurrentSong = ({ artist, songName, cover }: CurrentSongProps) => {
       <div className="sm:hidden md:flex md:flex-col">
         <h1 className="text-xl font-bold">{songName}</h1>
         <p>{artist}</p>
+      </div>
+      <div>
+        <Heart className="cursor-pointer text-lime-500" />
       </div>
     </div>
   );
