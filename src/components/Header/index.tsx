@@ -6,7 +6,7 @@ import { Search } from "lucide-react";
 export const Header = () => {
   return (
     <header className="flex items-center justify-between py-2 px-12 border-b border-zinc-800">
-      <h1 className="text-2xl font-bold">SoundByte</h1>
+      <h1 className="text-2xl font-bold">Sound<span className="text-lime-500">Byte</span></h1>
       <form className="w-96 relative">
         <Search
           size={20}
