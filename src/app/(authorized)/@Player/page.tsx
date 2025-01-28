@@ -1,6 +1,6 @@
 "use client";
 
-import { CurrentSong } from "@/components/CorrentSong";
+import { CurrentSong } from "@/components/CurrentSong";
 import { SoundControls } from "@/components/SoundControls";
 import React from "react";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
