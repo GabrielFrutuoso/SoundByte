@@ -45,7 +45,7 @@ export const PlaylistItem = ({
               alt="Album cover"
             />
           </div>
-          <Link href={`/search`}>
+          <Link href={`/playlist`}>
             <div className={`flex flex-col ${hideText && "text-lg font-bold"}`}>
               <h1>{songName}</h1>
               <p className={`${hideText && "hidden"}`}>playlist - {creator}</p>
