@@ -30,7 +30,6 @@ Table playlists {
   songs songs[]
   created_at timestamp
   updated_at timestamp
-  user_UUID varchar
 }
 
 table liked_songs {
