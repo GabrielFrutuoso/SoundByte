@@ -11,6 +11,7 @@ import {
 import { Plus } from "lucide-react";
 import { AddSongForm } from "@/forms/AddSongForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { AddPlaylistForm } from "@/forms/AddPlaylistForm";
 
 export const AddSongDialog = () => {
   return (
@@ -30,7 +31,9 @@ export const AddSongDialog = () => {
           <TabsContent value="music">
             <AddSongForm />
           </TabsContent>
-          <TabsContent value="playlist">test</TabsContent>
+          <TabsContent value="playlist">
+            <AddPlaylistForm />
+          </TabsContent>
         </Tabs>
       </DialogContent>
     </Dialog>
