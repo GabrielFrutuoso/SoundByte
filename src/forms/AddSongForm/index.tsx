@@ -13,26 +13,27 @@ import {
 } from "@/components/ui/select";
 import Image from "next/image";
 import { FileInput } from "@/components/FileInput";
-import { Music4 } from "lucide-react";
+import { ImageDownIcon } from "lucide-react";
 
 export const AddSongForm = () => {
-  const [file, setFile] = React.useState<File | null>(null);
-
-  console.log(file);
+  const [fileMusic, setMusicFile] = React.useState<File | null>(null);
+  const [fileBanner, setBannerFile] = React.useState<File | null>(null);
+  console.log(fileMusic?.name);
 
   return (
     <form className="flex items-center gap-6">
       <div className="flex flex-col items-center gap-6 flex-1">
         <FormField>
           <Label htmlFor="title">Titulo</Label>
-          <Input type="text" id="title" />
+          <Input name="title" type="text" id="title" />
         </FormField>
         <FormField>
           <Label htmlFor="artist">Artista</Label>
-          <Input type="text" id="artist" />
+          <Input name="artist" type="text" id="artist" />
         </FormField>
         <FormField>
-          <Select>
+          <Label htmlFor="privacy">Privacidade</Label>
+          <Select defaultValue="public" name="privacy">
             <SelectTrigger>
               <SelectValue placeholder="Privacidade" />
             </SelectTrigger>
@@ -43,27 +44,32 @@ export const AddSongForm = () => {
           </Select>
         </FormField>
         <FormField>
-          <Label htmlFor="file">Arquivo</Label>
+          <Label htmlFor="file-music">Arquivo</Label>
           <Input
             type="file"
-            id="file"
+            id="file-music"
             accept=".mp3"
-            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            onChange={(e) => setMusicFile(e.target.files?.[0] || null)}
           />
         </FormField>
       </div>
-      {file ? (
+      {fileBanner ? (
         <Image
-          src={URL.createObjectURL(file)}
-          alt={file.name}
+          src={URL.createObjectURL(fileBanner)}
+          alt={fileBanner.name}
           width={200}
           height={200}
         />
       ) : (
-        <FileInput id="file" accept=".png, .jpg, .jpeg" multiple>
-          <Music4 />
+        <FileInput
+          onChange={(e) => setBannerFile(e.target.files?.[0] || null)}
+          id="file-banner"
+          accept=".png, .jpeg, .jpg"
+          multiple
+        >
+          <ImageDownIcon size={100} />
         </FileInput>
       )}
     </form>
   );
-}
+};

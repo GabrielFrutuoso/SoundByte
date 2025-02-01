@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { AddSongForm } from "@/forms/AddSongForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 
 export const AddSongDialog = () => {
   return (
@@ -21,7 +22,16 @@ export const AddSongDialog = () => {
         <DialogHeader>
           <DialogTitle>Adicionar</DialogTitle>
         </DialogHeader>
-        <AddSongForm />
+        <Tabs>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="music">Música</TabsTrigger>
+            <TabsTrigger value="playlist">Playlist</TabsTrigger>
+          </TabsList>
+          <TabsContent value="music">
+            <AddSongForm />
+          </TabsContent>
+          <TabsContent value="playlist">test</TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
