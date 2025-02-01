@@ -1,5 +1,5 @@
 import { Volume, Volume1, Volume2, VolumeX } from "lucide-react";
-import { RangeInput } from "../RangeInput";
+import { RangeInput } from "../ui/RangeInput";
 
 interface VolumeControlProps {
   volume: number;

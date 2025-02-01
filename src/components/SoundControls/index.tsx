@@ -1,5 +1,5 @@
 import React from "react";
-import { RangeInput } from "../RangeInput";
+import { RangeInput } from "../ui/RangeInput";
 import { Play, Pause, SkipBack, SkipForward, Loader2 } from "lucide-react";
 
 interface SoundControlsProps {
@@ -17,14 +17,14 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
   currentTime,
   duration,
   onSeek,
-  isLoading = false
+  isLoading = false,
 }) => {
   // Format time to MM:SS
   const formatTime = (timeInSeconds: number) => {
-    if (!timeInSeconds || isNaN(timeInSeconds)) return '0:00';
+    if (!timeInSeconds || isNaN(timeInSeconds)) return "0:00";
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = Math.floor(timeInSeconds % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
   // Calculate seek value as a percentage
@@ -39,16 +39,16 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
   return (
     <div className="flex flex-col items-center w-96 gap-2">
       <div className="w-2/4 flex items-center justify-around">
-        <button 
-          title="previous" 
+        <button
+          title="previous"
           className="p-1 rounded-md hover:bg-primary/25 disabled:opacity-50"
           disabled={isLoading}
         >
           <SkipBack />
         </button>
-        <button 
+        <button
           title={isPlaying ? "pause" : "play"}
-          onClick={onPlayPause} 
+          onClick={onPlayPause}
           className="p-2 rounded-md hover:bg-primary/25 disabled:opacity-50"
           disabled={isLoading}
         >
@@ -60,8 +60,8 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
             <Play className="w-6 h-6" />
           )}
         </button>
-        <button 
-          title="next" 
+        <button
+          title="next"
           className="p-1 rounded-md hover:bg-primary/25 disabled:opacity-50"
           disabled={isLoading}
         >
@@ -69,12 +69,14 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
         </button>
       </div>
       <div className="w-full flex items-center justify-between space-x-4">
-        <span className="w-10 text-sm text-right">{formatTime(currentTime)}</span>
-        <RangeInput 
-          className="w-full" 
-          min={0} 
-          max={100} 
-          value={seekValue} 
+        <span className="w-10 text-sm text-right">
+          {formatTime(currentTime)}
+        </span>
+        <RangeInput
+          className="w-full"
+          min={0}
+          max={100}
+          value={seekValue}
           onChange={handleSeekChange}
           disabled={isLoading || duration === 0}
         />

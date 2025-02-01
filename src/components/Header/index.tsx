@@ -2,11 +2,13 @@ import React from "react";
 import { Input } from "../ui/input";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Search } from "lucide-react";
+import { AddSongDialog } from "../AddSongDialog";
 
 export const Header = () => {
   return (
     <header className="flex items-center justify-between py-2 px-12 border-b border-zinc-800">
       <h1 className="text-2xl font-bold">Sound<span className="text-lime-500">Byte</span></h1>
+      <div className="flex items-center gap-4">
       <form className="w-96 relative">
         <Search
           size={20}
@@ -14,6 +16,9 @@ export const Header = () => {
         />
         <Input className="bg-zinc-900/50 pl-8" type="text" />
       </form>
+      <AddSongDialog />        
+      </div>
+
       <Avatar>
         <AvatarFallback>CN</AvatarFallback>
       </Avatar>

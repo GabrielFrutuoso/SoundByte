@@ -25,7 +25,7 @@ export const SideBar = () => {
         </Link>
         <Link
           className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
-          href="/setting"
+          href="/settings"
         >
           <Settings />
           Configurações
