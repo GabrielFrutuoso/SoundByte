@@ -36,6 +36,7 @@ export const SideBar = () => {
         <ScrollArea className="h-[660px] w-full flex flex-col gap-4">
           {fakeArray.map((_, i) => (
             <PlaylistItem
+              id={i}
               key={i + "teste"}
               isPrivate={false}
               creator="Briel"
