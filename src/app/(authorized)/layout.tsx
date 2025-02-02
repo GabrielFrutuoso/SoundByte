@@ -21,18 +21,16 @@ export default function RootLayout({
   Player: React.ReactNode
 }>) {
   return (
-    <html lang="pt-br">
-      <body className="dark h-screen w-full flex flex-col">
-        <Header />
-        <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel minSize={15} defaultSize={15}>
-            <SideBar />
-          </ResizablePanel>
-          <ResizableHandle />
-          <ResizablePanel>{children}</ResizablePanel>
-        </ResizablePanelGroup>
-        {Player}
-      </body>
-    </html>
+    <>
+      <Header />
+      <ResizablePanelGroup direction="horizontal">
+        <ResizablePanel minSize={15} defaultSize={15}>
+          <SideBar />
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel>{children}</ResizablePanel>
+      </ResizablePanelGroup>
+      {Player}
+    </>
   );
 }
