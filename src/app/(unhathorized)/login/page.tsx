@@ -5,12 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RetroGrid } from "@/components/ui/retro-grid";
 import { Separator } from "@/components/ui/separator";
-import { Metadata } from "next";
 import Link from "next/link";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SoundByte - Login",
-  description: "Login page",
+  title: "Login",
+  openGraph: {
+    title: "SoundByte - Login"
+  }
 };
 
 export default function Login() {
