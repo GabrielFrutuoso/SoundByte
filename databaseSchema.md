@@ -27,7 +27,6 @@ Table playlists {
   title varchar
   banner_src varchar
   is_private boolean
-  songs songs[]
   created_at timestamp
   updated_at timestamp
 }
@@ -43,6 +42,13 @@ table liked_playlists {
   user_id UUID
   playlist_id UUID
 }
+
+table playlist_songs {
+  id UUID
+  song_id UUID
+  playlist_id UUID
+}
+
 
 table genres {
   id id
@@ -60,3 +66,7 @@ Ref: "liked_songs"."song_id" < "songs"."id"
 Ref: "songs"."user_UUID" < "users"."id"
 
 Ref: "genres"."id" < "songs"."genre_id"
+
+Ref: "songs"."id" < "playlist_songs"."song_id"
+
+Ref: "playlists"."id" < "playlist_songs"."playlist_id"
