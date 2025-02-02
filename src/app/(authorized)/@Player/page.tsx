@@ -39,7 +39,7 @@ export default function Player() {
       <VolumeControl volume={volume} onVolumeChange={handleVolumeChange} />
       <audio
         ref={audioRef}
-        src="./Bring Me The Horizon - Kool-Aid (Lyric Video).mp3"
+        src="/Bring Me The Horizon - Kool-Aid (Lyric Video).mp3"
       />
     </div>
   );
