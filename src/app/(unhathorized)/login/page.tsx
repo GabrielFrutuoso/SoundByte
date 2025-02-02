@@ -1,16 +1,18 @@
+import { LoginButton } from "@/components/LoginButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RetroGrid } from "@/components/ui/retro-grid";
 import { Separator } from "@/components/ui/separator";
-import { Metadata } from "next";
 import Link from "next/link";
-import { BsGoogle } from "react-icons/bs";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "SoundByte - Login",
-  description: "Login page",
+  title: "Login",
+  openGraph: {
+    title: "SoundByte - Login"
+  }
 };
 
 export default function Login() {
@@ -47,14 +49,7 @@ export default function Login() {
 
           <Separator className="my-4" />
 
-          <Button
-            variant={"outline"}
-            type="submit"
-            className="w-full flex items-center justify-center gap-2"
-          >
-            <BsGoogle />
-            <span>Login with Google</span>
-          </Button>
+          <LoginButton />
         </CardContent>
       </Card>
       <RetroGrid className="dark" />

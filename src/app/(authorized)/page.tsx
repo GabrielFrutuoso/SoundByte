@@ -1,11 +1,18 @@
+"use client";
+
 import { PlaylistItem } from "@/components/PlaylistItem";
 import { SongItem } from "@/components/SongItem";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 export default function Home() {
   const fakeArray = Array.from({ length: 8 }, (_, i) => i);
   const fakeArray2 = Array.from({ length: 6 }, (_, i) => i);
+
+  const { data: session } = useSession();
+
+  console.log(session);
 
   return (
     <main className="h-full">
