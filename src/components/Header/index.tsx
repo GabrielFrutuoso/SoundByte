@@ -7,7 +7,7 @@ import { Search } from "lucide-react";
 import { AddSongDialog } from "../AddSongDialog";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Menubar,
@@ -20,9 +20,17 @@ import {
 export const Header = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const preserveParams = (path: string) => {
+    const currentParams = new URLSearchParams(searchParams.toString());
+    const queryString = currentParams.toString();
+    return `${path}${queryString ? `?${queryString}` : ''}`;
+  };
+
   return (
     <header className="flex items-center justify-between py-2 px-12 border-b border-zinc-800">
-      <Link href="/">
+      <Link href={preserveParams("/")}>
         <h1 className="text-2xl font-bold">
           Sound<span className="text-lime-500">Byte</span>
         </h1>
@@ -48,7 +56,7 @@ export const Header = () => {
             </MenubarTrigger>
             <MenubarContent>
               <MenubarItem className="cursor-pointer">
-                <Link href="/settings">Configurações</Link>
+                <Link href={preserveParams("/settings")}>Configurações</Link>
               </MenubarItem>
               <MenubarItem
                 className="cursor-pointer text-red-500"
