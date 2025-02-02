@@ -3,10 +3,11 @@ import { SongItem } from "@/components/SongItem";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 
-export default function Home() {
+export default async function Home() {
   const fakeArray = Array.from({ length: 8 }, (_, i) => i);
   const fakeArray2 = Array.from({ length: 6 }, (_, i) => i);
 
+  
   return (
     <main className="h-full">
       <ScrollArea className="h-full px-12">
