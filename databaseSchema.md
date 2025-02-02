@@ -27,6 +27,7 @@ Table playlists {
   title varchar
   banner_src varchar
   is_private boolean
+  user_id UUID
   created_at timestamp
   updated_at timestamp
 }
@@ -70,3 +71,5 @@ Ref: "genres"."id" < "songs"."genre_id"
 Ref: "songs"."id" < "playlist_songs"."song_id"
 
 Ref: "playlists"."id" < "playlist_songs"."playlist_id"
+
+Ref: "playlists"."user_id" < "users"."id"
