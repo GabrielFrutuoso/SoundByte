@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { baseStyle, baseStyleProps } from "./style";
 import { Play } from "lucide-react";
@@ -11,7 +11,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "../ui/context-menu";
-import { useQueryState } from 'nuqs'
+import { useQueryState } from "nuqs";
 
 interface PlaylistItemProps {
   id: string | number;
@@ -31,25 +31,34 @@ export const PlaylistItem = ({
   variant,
   hideText,
 }: PlaylistItemProps & baseStyleProps) => {
-
-  const [name, setName] = useQueryState('playlist', {
+  const [name, setName] = useQueryState("playlist", {
     throttleMs: 1000,
-    shallow: true, 
+    shallow: true,
     parse: (value) => value || null,
-    defaultValue: null
-  })
+    defaultValue: null,
+  });
 
   const handlePlaylistSelect = async (playlistId: string | number) => {
     await setName(String(playlistId));
   };
 
-  console.log(name);
-  
+  useEffect(() => {
+    if (name !== "") {
+      localStorage.setItem("playlistId", JSON.stringify({ playlistId: name }));
+    }
+  }, [name]);
+
+  const playlistId = JSON.parse(localStorage.getItem('playlistId') || '{"playlistId": ""}')
 
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <div className={baseStyle({ variant })}>
+        <div
+          className={baseStyle({
+            variant,
+            className: `${playlistId.playlistId == id ? "text-lime-300" : ""} `,
+          })}
+        >
           <div className="relative">
             <button
               onClick={() => handlePlaylistSelect(id)}
