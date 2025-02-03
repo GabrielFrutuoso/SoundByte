@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { baseStyle, baseStyleProps } from "./style";
 import { Play } from "lucide-react";
@@ -38,17 +38,26 @@ export const PlaylistItem = ({
     defaultValue: null,
   });
 
+  const [playlistId, setPlaylistId] = useState("");
+
+  useEffect(() => {
+    const storedPlaylistId = typeof window !== "undefined" ? localStorage.getItem('playlistId') : null;
+    if (storedPlaylistId) {
+      setPlaylistId(JSON.parse(storedPlaylistId || '{"playlistId": ""}').playlistId);
+    }
+  }, [name]);
+
   const handlePlaylistSelect = async (playlistId: string | number) => {
     await setName(String(playlistId));
   };
 
   useEffect(() => {
     if (name !== "") {
-      localStorage.setItem("playlistId", JSON.stringify({ playlistId: name }));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("playlistId", JSON.stringify({ playlistId: name }));
+      }
     }
   }, [name]);
-
-  const playlistId = JSON.parse(localStorage.getItem('playlistId') || '{"playlistId": ""}')
 
   return (
     <ContextMenu>
@@ -56,7 +65,7 @@ export const PlaylistItem = ({
         <div
           className={baseStyle({
             variant,
-            className: `${playlistId.playlistId == id ? "text-lime-300" : ""} `,
+            className: `${playlistId == id ? "text-lime-300" : ""} `,
           })}
         >
           <div className="relative">
