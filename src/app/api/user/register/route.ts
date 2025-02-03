@@ -7,7 +7,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password, username, avatar, provider = "credentials" } = body;
 
-    // Validate required fields
     if (!email || !username) {
       return NextResponse.json(
         { error: "Email and username are required" },
@@ -15,7 +14,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate password only for credentials provider
     if (provider === "credentials") {
       if (!password) {
         return NextResponse.json(
@@ -23,6 +21,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+      
       if (password.length < 6) {
         return NextResponse.json(
           { error: "Password must be at least 6 characters long" },
@@ -31,7 +30,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
