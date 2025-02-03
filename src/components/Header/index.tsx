@@ -16,10 +16,12 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "../ui/menubar";
+import { useQueryState } from "nuqs";
 
 export const Header = () => {
   const { data: session } = useSession();
   const router = useRouter();
+  const [query, setQuery] = useQueryState("query");
 
   return (
     <header className="flex items-center justify-between py-2 px-12 border-b border-zinc-800">
@@ -34,7 +36,7 @@ export const Header = () => {
             size={20}
             className="absolute top-1/2 left-2 -translate-y-1/2"
           />
-          <Input className="bg-zinc-900/50 pl-8" type="text" />
+          <Input onChange={(e) => setQuery(e.target.value)} className="bg-zinc-900/50 pl-8" type="text" />
         </form>
         <AddSongDialog />
       </div>
