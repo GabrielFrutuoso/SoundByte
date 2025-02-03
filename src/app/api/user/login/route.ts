@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { prisma } from "../../PrismaClient";
+import { prisma } from "../../../../lib/PrismaClient";
 
 export async function POST(request: Request) {
   try {
@@ -27,7 +27,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password as string);
+    const passwordMatch = await bcrypt.compare(
+      password,
+      user.password as string
+    );
 
     if (!passwordMatch) {
       return NextResponse.json(

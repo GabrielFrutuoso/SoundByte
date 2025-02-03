@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../PrismaClient";
+import { prisma } from "../../../../lib/PrismaClient";
 import { hash } from "bcrypt";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, username, avatar, provider = "credentials" } = body;
+    const {
+      email,
+      password,
+      username,
+      avatar,
+      provider = "credentials",
+    } = body;
 
     if (!email || !username) {
       return NextResponse.json(
@@ -21,7 +27,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-      
+
       if (password.length < 6) {
         return NextResponse.json(
           { error: "Password must be at least 6 characters long" },
@@ -46,7 +52,7 @@ export async function POST(request: NextRequest) {
       username,
       provider,
       avatar: avatar || null,
-      ...(provider === "credentials" && { password: await hash(password, 10) })
+      ...(provider === "credentials" && { password: await hash(password, 10) }),
     };
 
     const user = await prisma.user.create({

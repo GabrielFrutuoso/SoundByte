@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "../PrismaClient";
+import { prisma } from "../../../lib/PrismaClient";
 
 export async function GET(request: Request) {
   try {
@@ -7,10 +7,7 @@ export async function GET(request: Request) {
     const email = searchParams.get("email");
 
     if (!email) {
-      return NextResponse.json(
-        { error: "Email is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
