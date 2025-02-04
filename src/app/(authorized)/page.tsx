@@ -3,20 +3,17 @@
 import { PlaylistItem } from "@/components/PlaylistItem";
 import { SongItem } from "@/components/SongItem";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useGetSongs } from "@/hooks/requests/useGetSongs.ts";
 import Link from "next/link";
-import { useQueryState } from "nuqs";
+import { SongItemProps } from "../types/SongProps.type";
+import { useGetSongs } from "@/hooks/requests/useGetSongs.ts";
 export default function Home() {
   const fakeArray = Array.from({ length: 8 }, (_, i) => i);
-  const fakeArray2 = Array.from({ length: 6 }, (_, i) => i);
+  // const fakeArray2 = Array.from({ length: 6 }, (_, i) => i);
 
-  const [query] = useQueryState("query");
-  const [genre] = useQueryState("genre");
-
-  const { data, isLoading, error } = useGetSongs(query as string, genre as string);
+  const { data, isLoading, error } = useGetSongs('', '');
 
   console.log(data, isLoading, error);
-   
+
   return (
     <main className="h-full">
       <ScrollArea className="h-full px-12">
@@ -43,12 +40,12 @@ export default function Home() {
               </Link>
             </div>
             <ul className="grid grid-cols-6 gap-1">
-              {fakeArray2.map((_, i) => (
-                <SongItem key={i + "teste"} />
+              {data?.data?.map((song: SongItemProps) => (
+                <SongItem key={song?.id} {...song} />
               ))}
             </ul>
           </div>
-          <div className="flex flex-col gap-2 mt-12">
+          {/* <div className="flex flex-col gap-2 mt-12">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold">Músicas nova na área!</h2>
               <Link className="underline" href="/library">
@@ -60,7 +57,7 @@ export default function Home() {
                 <SongItem key={i + "teste"} />
               ))}
             </ul>
-          </div>
+          </div>*/}
         </div>
       </ScrollArea>
     </main>
