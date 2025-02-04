@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("query");
     const genre = searchParams.get("genre");
+    const take = searchParams.get("take");
 
     const queries = [];
 
@@ -65,6 +66,7 @@ export async function GET(request: NextRequest) {
       orderBy: {
         updatedAt: "desc",
       },
+      take: take ? parseInt(take) : undefined,
     });
 
     return NextResponse.json(songs);
