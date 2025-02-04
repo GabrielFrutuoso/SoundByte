@@ -13,9 +13,10 @@ export const SongItem = (song: SongItemProps) => {
         <Image
           className="w-full object-cover aspect-square rounded-lg"
           draggable={false}
-          width={50}
-          height={50}
+          width={500}
+          height={500}
           src={song?.bannerSrc}
+          priority
           alt="Album cover"
         />
       </div>
