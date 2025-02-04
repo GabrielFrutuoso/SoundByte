@@ -22,6 +22,8 @@ export const Header = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const [query, setQuery] = useQueryState("query");
+  console.log(query);
+  
 
   return (
     <header className="flex items-center justify-between py-2 px-12 border-b border-zinc-800">
@@ -51,7 +53,7 @@ export const Header = () => {
             </MenubarTrigger>
             <MenubarContent>
               <MenubarItem className="cursor-pointer">
-                <Link href={'/settings'}>Configurações</Link>
+                <Link href={"/settings"}>Configurações</Link>
               </MenubarItem>
               <MenubarItem
                 className="cursor-pointer text-red-500"
