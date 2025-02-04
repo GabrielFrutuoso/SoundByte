@@ -6,10 +6,11 @@ import { BsGoogle } from "react-icons/bs";
 import { signIn } from "next-auth/react";
 
 export const LoginButton = () => {
+
   return (
     <Button
       onClick={() => {
-        signIn("google", { callbackUrl: "/" });
+        signIn("google", { callbackUrl: "/registerProvider" });
       }}
       variant={"outline"}
       type="submit"
