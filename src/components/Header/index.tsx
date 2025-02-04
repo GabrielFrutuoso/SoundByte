@@ -40,7 +40,9 @@ export const Header = () => {
           />
           <Input onChange={(e) => setQuery(e.target.value)} className="bg-zinc-900/50 pl-8" type="text" />
         </form>
-        <AddSongDialog />
+        {session?.user?.name && (
+          <AddSongDialog />
+        )}
       </div>
       {session?.user?.name ? (
         <Menubar className="focus:outline-none rounded-full appearance-none border-none px-0">
