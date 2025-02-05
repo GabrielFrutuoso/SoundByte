@@ -86,12 +86,14 @@ export const PlaylistItem = ({
               alt="Album cover"
             />
           </div>
+          {variant == "menu" && (
           <Link href={`/${id}/playlist`}>
             <div className={`flex flex-col ${hideText && "text-lg font-bold"}`}>
               <h1>{songName}</h1>
               <p className={`${hideText && "hidden"}`}>playlist - {creator}</p>
             </div>
           </Link>
+          )}
         </div>
       </ContextMenuTrigger>
 

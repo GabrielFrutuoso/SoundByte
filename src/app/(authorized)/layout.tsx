@@ -15,18 +15,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  Player
+  Player,
 }: Readonly<{
   children: React.ReactNode;
-  Player: React.ReactNode
+  Player: React.ReactNode;
 }>) {
   return (
     <>
       <Header />
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel minSize={15} defaultSize={15}>
+        
           <SideBar />
-        </ResizablePanel>
         <ResizableHandle />
         <ResizablePanel>{children}</ResizablePanel>
       </ResizablePanelGroup>

@@ -1,46 +1,62 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import Link from "next/link";
-import { HomeIcon, Search, Settings } from "lucide-react";
+import { HomeIcon, PanelLeft, Search, Settings } from "lucide-react";
 import { PlaylistItem } from "../PlaylistItem";
 import { useSession } from "next-auth/react";
+import { Separator } from "../ui/separator";
+import { ResizablePanel } from "../ui/resizable";
 
 export const SideBar = () => {
   const fakeArray = Array.from({ length: 20 }, (_, i) => i);
   const { data: session } = useSession();
+  const [layout, setLayout] = useState(4.5);
+
+  const handleLayoutChange = (size: number) => {
+    return layout === 4.5 ? setLayout(size) : setLayout(4.5);
+  };
+
   return (
-    <div className="flex flex-col p-4 gap-8">
-      <ul className="flex flex-col">
-        <Link
-          className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
-          href="/"
+    <ResizablePanel defaultSize={layout} minSize={layout} maxSize={layout}>
+      <div className="flex flex-col">
+        <ul
+          className={`flex flex-col ${
+            layout === 4.5 ? "items-center justify-center" : ""
+          }  gap-2 px-4 pt-4`}
         >
-          <HomeIcon />
-          Home
-        </Link>
-        <Link
-          className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
-          href="/search"
-        >
-          <Search />
-          Pesquisar
-        </Link>
-        {session?.user && (
+          <PanelLeft
+            onClick={() => handleLayoutChange(12)}
+            className="text-zinc-400 cursor-pointer"
+          />
           <Link
             className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
-            href="/settings"
+            href="/"
           >
-            <Settings />
-            Configurações
+            <HomeIcon />
+            {layout !== 4.5 && <span>Home</span>}
           </Link>
-        )}
-      </ul>
-      {session?.user && (
-        <div className="flex flex-col gap-2">
-          <h1 className="text-xl font-bold">Minhas Playlists</h1>
-          <ScrollArea className="h-[660px] w-full flex flex-col gap-4">
+          <Link
+            className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
+            href="/search"
+          >
+            <Search />
+            {layout !== 4.5 && <span>Search</span>}
+          </Link>
+          {session?.user && (
+            <Link
+              className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
+              href="/settings"
+            >
+              <Settings />
+              {layout !== 4.5 && <span>Settings</span>}
+            </Link>
+          )}
+        </ul>
+        <Separator className="my-2" orientation="horizontal" />
+        {session?.user && (
+          <ScrollArea className="h-[670px] w-full flex flex-col justify-center items-center gap-4 px-4">
             {fakeArray.map((_, i) => (
               <PlaylistItem
                 id={i}
@@ -52,8 +68,8 @@ export const SideBar = () => {
               />
             ))}
           </ScrollArea>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </ResizablePanel>
   );
 };
