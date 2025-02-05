@@ -2,10 +2,10 @@
 
 import React from "react";
 import { Input } from "../ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Search } from "lucide-react";
 import { AddSongDialog } from "../AddSongDialog";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -17,13 +17,14 @@ import {
   MenubarTrigger,
 } from "../ui/menubar";
 import { useQueryState } from "nuqs";
+import { useUserStore } from "@/store/userStore";
+import Image from "next/image";
 
 export const Header = () => {
-  const { data: session } = useSession();
   const router = useRouter();
   const [query, setQuery] = useQueryState("query");
   console.log(query);
-  
+  const { user } = useUserStore();
 
   return (
     <header className="flex items-center justify-between py-2 px-12 border-b border-zinc-800">
@@ -38,18 +39,25 @@ export const Header = () => {
             size={20}
             className="absolute top-1/2 left-2 -translate-y-1/2"
           />
-          <Input onChange={(e) => setQuery(e.target.value)} className="bg-zinc-900/50 pl-8" type="text" />
+          <Input
+            onChange={(e) => setQuery(e.target.value)}
+            className="bg-zinc-900/50 pl-8"
+            type="text"
+          />
         </form>
-        {session?.user?.name && (
-          <AddSongDialog />
-        )}
+        {user?.username && <AddSongDialog />}
       </div>
-      {session?.user?.name ? (
+      {user?.username ? (
         <Menubar className="focus:outline-none rounded-full appearance-none border-none px-0">
           <MenubarMenu>
             <MenubarTrigger className="focus:outline-none rounded-full appearance-none border-none px-0 cursor-pointer">
               <Avatar>
-                <AvatarImage src={session?.user?.image as string} />
+                <Image
+                  width={40}
+                  height={40}
+                  src={user?.avatar || ""}
+                  alt="Avatar"
+                />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </MenubarTrigger>

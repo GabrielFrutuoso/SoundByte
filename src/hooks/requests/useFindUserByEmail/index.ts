@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 type UserData = {
+  username: string;
   id: string;
   email: string;
   name: string;
