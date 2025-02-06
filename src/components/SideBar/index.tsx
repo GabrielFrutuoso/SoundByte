@@ -62,7 +62,7 @@ export const SideBar = () => {
         </ul>
         <Separator className="my-2" orientation="horizontal" />
         {session?.user && (
-          <ScrollArea className="h-[670px] w-full flex flex-col justify-center items-center gap-4 px-4">
+          <ScrollArea className="h-[640px] w-full flex flex-col justify-center items-center gap-4 px-4">
             {fakeArray.map((_, i) => (
               <PlaylistItem
                 id={i}
