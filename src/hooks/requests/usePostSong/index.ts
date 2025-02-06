@@ -1,3 +1,4 @@
+import { toast } from '@/hooks/use-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
@@ -23,6 +24,10 @@ export const usePostSong = () => {
     mutationFn: postSong,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['songs'] });
+      toast({
+        title: "Sucesso",
+        description: "A musica foi publicada",
+      })
     },
   });
 };
