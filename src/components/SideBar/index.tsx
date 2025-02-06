@@ -8,6 +8,7 @@ import { PlaylistItem } from "../PlaylistItem";
 import { useSession } from "next-auth/react";
 import { Separator } from "../ui/separator";
 import { ResizablePanel } from "../ui/resizable";
+import { Button } from "../ui/button";
 
 export const SideBar = () => {
   const fakeArray = Array.from({ length: 20 }, (_, i) => i);
@@ -26,10 +27,15 @@ export const SideBar = () => {
             layout === 4.5 ? "items-center justify-center" : ""
           }  gap-2 px-4 pt-4`}
         >
-          <PanelLeft
+          <Button
             onClick={() => handleLayoutChange(15)}
-            className="text-zinc-400 cursor-pointer"
-          />
+            variant="ghost"
+            className="text-zinc-400 cursor-pointer flex items-center"
+          >
+            <PanelLeft className="text-zinc-400 " size={25} />
+            {layout !== 4.5 && <span>Mudar Layout</span>}
+          </Button>
+
           <Link
             className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
             href="/"
