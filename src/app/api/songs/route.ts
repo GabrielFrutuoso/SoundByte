@@ -78,3 +78,39 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { title, artist, bannerSrc, songURL, genreId, isPrivate, userUUID } =
+      body;
+
+    if (!userUUID) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    await prisma.song.create({
+      data: {
+        title,
+        artist,
+        bannerSrc,
+        songURL,
+        genreId,
+        isPrivate,
+        userUUID,
+      },
+    });
+    return NextResponse.json(
+      { message: "Song created successfully" },
+      {
+        status: 201,
+      }
+    );
+  } catch (error) {
+    console.error("Error in POST /api/songs:", error);
+    return NextResponse.json(
+      { error: "Failed to create song" },
+      { status: 500 }
+    );
+  }
+}
