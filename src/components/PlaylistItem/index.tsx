@@ -21,6 +21,7 @@ interface PlaylistItemProps {
   cover: string;
   variant?: string;
   hideText?: boolean;
+  layout?: number;
 }
 
 export const PlaylistItem = ({
@@ -30,6 +31,7 @@ export const PlaylistItem = ({
   creator,
   variant,
   hideText,
+  layout,
 }: PlaylistItemProps & baseStyleProps) => {
   const [name, setName] = useQueryState("playlist", {
     throttleMs: 1000,
@@ -86,7 +88,7 @@ export const PlaylistItem = ({
               alt="Album cover"
             />
           </div>
-          {variant == "menu" && (
+          {layout !== 4.5 && (
           <Link href={`/${id}/playlist`}>
             <div className={`flex flex-col ${hideText && "text-lg font-bold"}`}>
               <h1>{songName}</h1>
