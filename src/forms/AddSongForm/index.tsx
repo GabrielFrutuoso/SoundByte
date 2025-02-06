@@ -14,7 +14,7 @@ import {
 import Image from "next/image";
 import { FileInput } from "@/components/FileInput";
 import { ImageDownIcon } from "lucide-react";
-import { usePostSong } from "@/hooks/requests/usePostSong";
+import { usePostSong } from "@/hooks/requests/song/usePostSong";
 import { useUserStore } from "@/store/userStore";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";

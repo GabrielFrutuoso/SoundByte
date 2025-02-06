@@ -2,7 +2,7 @@ import Link from "next/link";
 import React from "react";
 import { SongItem } from "../SongItem";
 import { SongItemProps } from "@/app/types/SongProps.type";
-import { useGetSongs } from "@/hooks/requests/useGetSongs.ts";
+import { useGetSongs } from "@/hooks/requests/song/useGetSongs.ts";
 
 interface SongGroupProps {
     title: string;

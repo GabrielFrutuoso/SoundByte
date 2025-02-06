@@ -1,7 +1,7 @@
 "use client";
 
-import { useFindUserByEmail } from "@/hooks/requests/useFindUserByEmail";
-import { useRegisterUser } from "@/hooks/requests/useRegisterUser";
+import { useFindUserByEmail } from "@/hooks/requests/user/useFindUserByEmail";
+import { useRegisterUser } from "@/hooks/requests/user/useRegisterUser";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
@@ -9,7 +9,9 @@ import React, { useEffect } from "react";
 export default function RegisterProviderPage() {
   const router = useRouter();
   const { data: session } = useSession();
-  const { data: user, isLoading } = useFindUserByEmail(session?.user?.email || "");
+  const { data: user, isLoading } = useFindUserByEmail(
+    session?.user?.email || ""
+  );
   const { mutate: register, isPending: isRegistering } = useRegisterUser({
     onSuccess: () => router.push("/"),
   });
@@ -20,7 +22,7 @@ export default function RegisterProviderPage() {
         email: session.user.email!,
         username: session.user.name!,
         avatar: session.user.image!,
-        provider: "google"
+        provider: "google",
       });
     } else if (!isLoading && user) {
       router.push("/");

@@ -5,7 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { SongGroup } from "@/components/SongsGroup";
 import { useSession } from "next-auth/react";
 import { User, useUserStore } from "@/store/userStore";
-import { useFindUserByEmail } from "@/hooks/requests/useFindUserByEmail";
+import { useFindUserByEmail } from "@/hooks/requests/user/useFindUserByEmail";
 import { useEffect } from "react";
 
 export default function Home() {
@@ -22,14 +22,13 @@ export default function Home() {
         username: data.username,
         avatar: data.avatar || "",
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
       setUser(userWithRequiredFields);
     }
   }, [data, setUser]);
 
   console.log("user: ", user);
-  
 
   return (
     <main className="h-full">
