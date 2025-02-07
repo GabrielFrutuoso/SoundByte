@@ -8,6 +8,11 @@ export async function GET() {
         id: true,
         title: true,
         bannerSrc: true,
+        user: {
+          select: {
+            username: true,
+          }
+        }
       },
       where: {
         isPrivate: false
