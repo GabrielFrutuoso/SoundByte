@@ -13,25 +13,25 @@ import {
 } from "../ui/context-menu";
 import { useQueryState } from "nuqs";
 
-interface PlaylistItemProps {
+export interface PlaylistItemProps {
   id: string | number;
-  songName: string;
+  title: string;
+  bannerSrc: string;
   isPrivate: boolean;
-  creator: string;
-  cover: string;
   variant?: string;
   hideText?: boolean;
   layout?: number;
+  username: string;
 }
 
 export const PlaylistItem = ({
   id,
-  songName,
-  cover,
-  creator,
+  title,
+  bannerSrc,
   variant,
   hideText,
   layout,
+  username
 }: PlaylistItemProps & baseStyleProps) => {
   const [name, setName] = useQueryState("playlist", {
     throttleMs: 1000,
@@ -79,22 +79,26 @@ export const PlaylistItem = ({
             </button>
             <Image
               className={` ${
-                hideText && "w-16"
+                hideText && "w-20"
               } rounded-lg aspect-square object-cover`}
               draggable={false}
-              src={cover}
+              src={bannerSrc}
               width={50}
               height={50}
               alt="Album cover"
             />
           </div>
           {layout !== 4.5 && (
-          <Link href={`/${id}/playlist`}>
-            <div className={`flex flex-col ${hideText && "text-lg font-bold"}`}>
-              <h1>{songName}</h1>
-              <p className={`${hideText && "hidden"}`}>playlist - {creator}</p>
-            </div>
-          </Link>
+            <Link className="w-full" href={`/${id}/playlist`}>
+              <div
+                className={`flex flex-col ${hideText && "text-lg font-bold"}`}
+              >
+                <h1>{title}</h1>
+                <p className={`${hideText && "hidden"}`}>
+                  playlist - {username}
+                </p>
+              </div>
+            </Link>
           )}
         </div>
       </ContextMenuTrigger>
