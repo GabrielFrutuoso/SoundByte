@@ -19,15 +19,36 @@ export async function GET(
         },
         songs: {
           include: {
-            song: true,
+            song: {
+              select: {
+                id: true,
+                title: true,
+                artist: true,
+                bannerSrc: true,
+                songURL: true,
+                isPrivate: true,
+                createdAt: true,
+                updatedAt: true,
+                user: {
+                  select: {
+                    username: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
     });
 
     if (!playlist) {
-      return NextResponse.json({ error: "Playlist not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Playlist not found" },
+        { status: 404 }
+      );
     }
+
+    console.log("Playlist data:", JSON.stringify(playlist, null, 2));
 
     return NextResponse.json(playlist, { status: 200 });
   } catch (error) {
