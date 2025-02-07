@@ -11,9 +11,7 @@ interface SongGroupProps {
 }
 
 export const SongGroup = ({ title, description, redirectTo }: SongGroupProps) => {
-  const { data, isLoading, error } = useGetSongs("", "", 6);
-
-  console.log(data, isLoading, error);
+  const { data } = useGetSongs("", "", 6);
 
   return (
     <div className="flex flex-col gap-2 mt-12">

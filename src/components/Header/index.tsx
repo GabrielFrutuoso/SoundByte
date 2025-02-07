@@ -23,7 +23,6 @@ import Image from "next/image";
 export const Header = () => {
   const router = useRouter();
   const [query, setQuery] = useQueryState("query");
-  console.log(query);
   const { user } = useUserStore();
 
   return (
