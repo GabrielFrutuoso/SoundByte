@@ -51,20 +51,29 @@ export default function Playlist() {
         <TableHeader className="sticky top-0 bg-zinc-950">
           <TableRow>
             <TableHead></TableHead>
-            <TableHead>Nome da música</TableHead>
+            <TableHead>Nome da musica</TableHead>
             <TableHead>Artista/Banda</TableHead>
             <TableHead>Adicionado por</TableHead>
             <TableHead>Adicionado em</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow className="hover:bg-zinc-800 text-lg font-semibold cursor-pointer">
+          {playlist?.songs.map((song, index) => (
+            <TableRow key={song?.song?.id} className="hover:bg-zinc-800 text-lg font-semibold cursor-pointer">
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>{song?.song?.title}</TableCell>
+              <TableCell>{song?.song?.artist}</TableCell>
+              <TableCell>{song?.song?.user?.username}</TableCell>
+              <TableCell>{new Date(song?.song?.createdAt).toLocaleDateString()}</TableCell>
+            </TableRow>
+          ))}
+          {/* <TableRow className="hover:bg-zinc-800 text-lg font-semibold cursor-pointer">
             <TableCell>1</TableCell>
             <TableCell>(OST) Dreamseeker</TableCell>
             <TableCell>Bring Me The Horizon</TableCell>
             <TableCell>{playlist?.user?.username}</TableCell>
             <TableCell>{new Date().toLocaleDateString()}</TableCell>
-          </TableRow>
+          </TableRow> */}
         </TableBody>
       </Table>
     </div>
