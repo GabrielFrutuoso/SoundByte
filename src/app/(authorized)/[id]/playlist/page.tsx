@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { Separator } from "@/components/ui/separator";
 import {
@@ -10,15 +10,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetPlaylistById } from "@/hooks/requests/playlist/useGetPlaylistById";
-import { Ellipsis, Heart, Play } from "lucide-react";
+import { Ellipsis, Heart, Music, Play } from "lucide-react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export default function Playlist() {
-  const params = useParams();
-  const id = params.id;
-  const { data: playlist } = useGetPlaylistById(id as string);
+  const [playlistId, setPlaylistId] = useState<string>("");
+
+  useEffect(() => {
+    const storedPlaylistId = typeof window !== "undefined" ? localStorage.getItem('playlistId') : null;
+    if (storedPlaylistId) {
+      setPlaylistId(JSON.parse(storedPlaylistId || '{"playlistId": ""}').playlistId);
+    }
+  }, []);
+
+  const { data: playlist } = useGetPlaylistById(playlistId);
   console.log("playlist: ", playlist);
 
   return (
@@ -35,7 +41,9 @@ export default function Playlist() {
         <div className="flex flex-col gap-3">
           <div>
             <h1 className="text-4xl font-bold">{playlist?.title}</h1>
-            <h2 className="text-muted-foreground">{playlist?.user?.username}</h2>
+            <h2 className="text-muted-foreground">
+              {playlist?.user?.username}
+            </h2>
           </div>
           <div className="flex gap-3">
             <Play size={40} />
@@ -46,36 +54,40 @@ export default function Playlist() {
       </div>
 
       <Separator orientation="horizontal" />
-
-      <Table>
-        <TableHeader className="sticky top-0 bg-zinc-950">
-          <TableRow>
-            <TableHead></TableHead>
-            <TableHead>Nome da musica</TableHead>
-            <TableHead>Artista/Banda</TableHead>
-            <TableHead>Adicionado por</TableHead>
-            <TableHead>Adicionado em</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {playlist?.songs.map((song, index) => (
-            <TableRow key={song?.song?.id} className="hover:bg-zinc-800 text-lg font-semibold cursor-pointer">
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{song?.song?.title}</TableCell>
-              <TableCell>{song?.song?.artist}</TableCell>
-              <TableCell>{song?.song?.user?.username}</TableCell>
-              <TableCell>{new Date(song?.song?.createdAt).toLocaleDateString()}</TableCell>
+      {(playlist?.songs?.length ?? 0) > 0 ? (
+        <Table>
+          <TableHeader className="sticky top-0 bg-zinc-950">
+            <TableRow>
+              <TableHead></TableHead>
+              <TableHead>Nome da musica</TableHead>
+              <TableHead>Artista/Banda</TableHead>
+              <TableHead>Adicionado por</TableHead>
+              <TableHead>Adicionado em</TableHead>
             </TableRow>
-          ))}
-          {/* <TableRow className="hover:bg-zinc-800 text-lg font-semibold cursor-pointer">
-            <TableCell>1</TableCell>
-            <TableCell>(OST) Dreamseeker</TableCell>
-            <TableCell>Bring Me The Horizon</TableCell>
-            <TableCell>{playlist?.user?.username}</TableCell>
-            <TableCell>{new Date().toLocaleDateString()}</TableCell>
-          </TableRow> */}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {playlist?.songs.map((song, index) => (
+                <TableRow
+                  key={song?.song?.id}
+                  className="hover:bg-zinc-800 text-lg font-semibold cursor-pointer"
+                >
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{song?.song?.title}</TableCell>
+                  <TableCell>{song?.song?.artist}</TableCell>
+                  <TableCell>{song?.song?.user?.username}</TableCell>
+                  <TableCell>
+                    {new Date(song?.song?.createdAt).toLocaleDateString()}
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-full text-zinc-600">
+          <Music size={100} />
+          <p className="text-2xl font-bold">Nenhuma música nesta playlist</p>
+        </div>
+      )}
     </div>
   );
 }
