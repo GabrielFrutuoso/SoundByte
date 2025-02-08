@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { baseStyle, baseStyleProps } from "./style";
 import { Play } from "lucide-react";
@@ -11,7 +11,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "../ui/context-menu";
-import { useQueryState } from "nuqs";
+import { usePlaylistStore } from "@/store/playlistStore";
 
 export interface PlaylistItemProps {
   id: string | number;
@@ -31,35 +31,13 @@ export const PlaylistItem = ({
   variant,
   hideText,
   layout,
-  username
+  username,
 }: PlaylistItemProps & baseStyleProps) => {
-  const [name, setName] = useQueryState("playlist", {
-    throttleMs: 1000,
-    shallow: true,
-    parse: (value) => value || null,
-    defaultValue: null,
-  });
+  const { playlistId, setPlaylistId } = usePlaylistStore();
 
-  const [playlistId, setPlaylistId] = useState("");
-
-  useEffect(() => {
-    const storedPlaylistId = typeof window !== "undefined" ? localStorage.getItem('playlistId') : null;
-    if (storedPlaylistId) {
-      setPlaylistId(JSON.parse(storedPlaylistId || '{"playlistId": ""}').playlistId);
-    }
-  }, [name]);
-
-  const handlePlaylistSelect = async (playlistId: string | number) => {
-    await setName(String(playlistId));
+  const handlePlaylistSelect = (id: string | number) => {
+    setPlaylistId(String(id));
   };
-
-  useEffect(() => {
-    if (name !== "") {
-      if (typeof window !== "undefined") {
-        localStorage.setItem("playlistId", JSON.stringify({ playlistId: name }));
-      }
-    }
-  }, [name]);
 
   return (
     <ContextMenu>
@@ -67,12 +45,11 @@ export const PlaylistItem = ({
         <div
           className={baseStyle({
             variant,
-            className: `${playlistId == id ? "text-lime-300" : ""} `,
+            className: `${playlistId === String(id) ? "text-lime-500" : ""}`,
           })}
         >
-          <div className="relative">
+          <div onClick={() => handlePlaylistSelect(id)} className="relative group">
             <button
-              onClick={() => handlePlaylistSelect(id)}
               className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg"
             >
               <Play />
