@@ -15,7 +15,7 @@ export default function Player() {
     `Fetching song with singleSongId: ${singleSongId}, playlistId: ${playlistId}, index: ${index}`
   );
   const validIndex = index !== undefined ? index : 0;
-  const { data } = useGetToListen(undefined, playlistId, validIndex);
+  const { data } = useGetToListen(singleSongId, playlistId, validIndex);
 
   const {
     isPlaying,
