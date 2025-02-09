@@ -11,6 +11,7 @@ interface SoundControlsProps {
   isLoading?: boolean;
   onNext?: () => void;
   onPrevious?: () => void;
+  disabled?: boolean;
 }
 
 export const SoundControls: React.FC<SoundControlsProps> = ({
@@ -22,6 +23,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
   isLoading = false,
   onNext,
   onPrevious,
+  disabled = false,
 }) => {
   // Format time to MM:SS
   const formatTime = (timeInSeconds: number) => {
@@ -47,7 +49,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
           onClick={onPrevious}
           title="previous"
           className="p-1 rounded-md hover:bg-primary/25 disabled:opacity-50"
-          disabled={isLoading}
+          disabled={isLoading || disabled}
         >
           <SkipBack />
         </button>
@@ -55,7 +57,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
           title={isPlaying ? "pause" : "play"}
           onClick={onPlayPause}
           className="p-2 rounded-md hover:bg-primary/25 disabled:opacity-50"
-          disabled={isLoading}
+          disabled={isLoading || disabled}
         >
           {isLoading ? (
             <Loader2 className="w-6 h-6 animate-spin" />
@@ -69,7 +71,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
           onClick={onNext}
           title="next"
           className="p-1 rounded-md hover:bg-primary/25 disabled:opacity-50"
-          disabled={isLoading}
+          disabled={isLoading || disabled}
         >
           <SkipForward />
         </button>
@@ -84,7 +86,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
           max={100}
           value={seekValue}
           onChange={handleSeekChange}
-          disabled={isLoading || duration === 0}
+          disabled={isLoading || duration === 0 || disabled}
         />
         <span className="w-10 text-sm">{formatTime(duration)}</span>
       </div>
