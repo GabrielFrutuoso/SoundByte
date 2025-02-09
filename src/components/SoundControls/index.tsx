@@ -9,6 +9,8 @@ interface SoundControlsProps {
   duration: number;
   onSeek: (value: number) => void;
   isLoading?: boolean;
+  onNext: () => void;
+  onPrevious: () => void;
 }
 
 export const SoundControls: React.FC<SoundControlsProps> = ({
@@ -18,6 +20,8 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
   duration,
   onSeek,
   isLoading = false,
+  onNext,
+  onPrevious,
 }) => {
   // Format time to MM:SS
   const formatTime = (timeInSeconds: number) => {
@@ -40,6 +44,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
     <div className="flex flex-col items-center w-96 gap-2">
       <div className="w-2/4 flex items-center justify-around">
         <button
+          onClick={onPrevious}
           title="previous"
           className="p-1 rounded-md hover:bg-primary/25 disabled:opacity-50"
           disabled={isLoading}
@@ -61,6 +66,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
           )}
         </button>
         <button
+          onClick={onNext}
           title="next"
           className="p-1 rounded-md hover:bg-primary/25 disabled:opacity-50"
           disabled={isLoading}

@@ -101,6 +101,13 @@ export function useAudioPlayer() {
     }
   };
 
+  const handleSongChange = (src: string) => {
+    if (!audioRef.current) return;
+    audioRef.current.src = src;
+
+    audioRef.current.pause();
+  }
+
   return {
     isPlaying,
     currentTime,
@@ -111,5 +118,6 @@ export function useAudioPlayer() {
     handlePlayPause,
     handleSeek,
     handleVolumeChange,
+    handleSongChange,
   };
 }
