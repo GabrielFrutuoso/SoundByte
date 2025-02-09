@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     }
 
     if (!song) {
-      return NextResponse.json({ error: "Song not found" }, { status: 404 });
+      return NextResponse.json({ message: "Song not found" }, { status: 200 });
     }
 
     return NextResponse.json(song, { status: 200 });
