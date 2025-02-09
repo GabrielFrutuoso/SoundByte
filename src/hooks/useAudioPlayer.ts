@@ -20,21 +20,21 @@ export function useAudioPlayer() {
       setTimeout(() => {
         if (audioElement.readyState === 0) {
           setIsLoading(false);
-          console.error('Audio failed to load within timeout');
+          console.error("Audio failed to load within timeout");
         }
       }, 5000);
     };
-    
+
     const handleCanPlay = () => {
       setIsLoading(false);
       setDuration(audioElement.duration);
     };
-    
+
     const handleLoadedData = () => {
       setIsLoading(false);
       setDuration(audioElement.duration);
     };
-    
+
     const handleTimeUpdate = () => {
       setCurrentTime(audioElement.currentTime);
     };
@@ -45,16 +45,16 @@ export function useAudioPlayer() {
     };
 
     const handleError = (e: ErrorEvent) => {
-      console.error('Audio Error:', e);
+      console.error("Audio Error:", e);
       setIsLoading(false);
     };
 
-    audioElement.addEventListener('loadstart', handleLoadStart);
-    audioElement.addEventListener('canplay', handleCanPlay);
-    audioElement.addEventListener('loadeddata', handleLoadedData);
-    audioElement.addEventListener('timeupdate', handleTimeUpdate);
-    audioElement.addEventListener('ended', handleEnded);
-    audioElement.addEventListener('error', handleError);
+    audioElement.addEventListener("loadstart", handleLoadStart);
+    audioElement.addEventListener("canplay", handleCanPlay);
+    audioElement.addEventListener("loadeddata", handleLoadedData);
+    audioElement.addEventListener("timeupdate", handleTimeUpdate);
+    audioElement.addEventListener("ended", handleEnded);
+    audioElement.addEventListener("error", handleError);
 
     if (audioElement.readyState >= 2) {
       setIsLoading(false);
@@ -62,12 +62,12 @@ export function useAudioPlayer() {
     }
 
     return () => {
-      audioElement.removeEventListener('loadstart', handleLoadStart);
-      audioElement.removeEventListener('canplay', handleCanPlay);
-      audioElement.removeEventListener('loadeddata', handleLoadedData);
-      audioElement.removeEventListener('timeupdate', handleTimeUpdate);
-      audioElement.removeEventListener('ended', handleEnded);
-      audioElement.removeEventListener('error', handleError);
+      audioElement.removeEventListener("loadstart", handleLoadStart);
+      audioElement.removeEventListener("canplay", handleCanPlay);
+      audioElement.removeEventListener("loadeddata", handleLoadedData);
+      audioElement.removeEventListener("timeupdate", handleTimeUpdate);
+      audioElement.removeEventListener("ended", handleEnded);
+      audioElement.removeEventListener("error", handleError);
     };
   }, [volume]);
 
@@ -77,8 +77,8 @@ export function useAudioPlayer() {
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play().catch(error => {
-        console.error('Play Error:', error);
+      audioRef.current.play().catch((error) => {
+        console.error("Play Error:", error);
         setIsLoading(false);
       });
     }
@@ -87,7 +87,7 @@ export function useAudioPlayer() {
 
   const handleSeek = (value: number) => {
     if (!audioRef.current || isLoading) return;
-    
+
     audioRef.current.currentTime = value;
     setCurrentTime(value);
   };
@@ -95,18 +95,35 @@ export function useAudioPlayer() {
   const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(event.target.value);
     setVolume(newVolume);
-    
+
     if (audioRef.current) {
       audioRef.current.volume = newVolume;
     }
   };
 
-  const handleSongChange = (src: string) => {
-    if (!audioRef.current) return;
+  const handleSongChange = (src?: string) => {
+    if (!audioRef.current || !src) return;
+    
+    setIsLoading(true);
+    setIsPlaying(false);
+    setCurrentTime(0);
+    
     audioRef.current.src = src;
-
-    audioRef.current.pause();
-  }
+    audioRef.current.load();
+    
+    // Auto-play when ready
+    const playWhenReady = () => {
+      audioRef.current?.play()
+        .then(() => setIsPlaying(true))
+        .catch(error => {
+          console.error('Auto-play Error:', error);
+          setIsPlaying(false);
+        });
+      audioRef.current?.removeEventListener('canplay', playWhenReady);
+    };
+    
+    audioRef.current.addEventListener('canplay', playWhenReady);
+  };
 
   return {
     isPlaying,

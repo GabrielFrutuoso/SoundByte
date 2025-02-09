@@ -6,12 +6,13 @@ import { VolumeControl } from "@/components/VolumeControl";
 import { useGetPlaylistById } from "@/hooks/requests/playlist/useGetPlaylistById";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { usePlaylistStore } from "@/store/playlistStore";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from 'react';
 
 export default function Player() {
-  const { playlistId } = usePlaylistStore();
+  const { playlistId, singleSong } = usePlaylistStore();
   const { data: playlist } = useGetPlaylistById(playlistId as string);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentSong, setCurrentSong] = useState<any | null>(null);
 
   const {
     isPlaying,
@@ -27,32 +28,43 @@ export default function Player() {
   } = useAudioPlayer();
 
   useEffect(() => {
-    if (playlist?.songs?.[currentIndex]?.song?.songURL) {
-      handleSongChange(playlist.songs[currentIndex].song.songURL);
+    if (singleSong) {
+      setCurrentSong(singleSong);
+    } else if (playlist) {
+      setCurrentSong(playlist.songs[0]?.song);
     }
-  }, [playlist, currentIndex]);
+  }, [singleSong, playlist]);
 
   const handleNext = () => {
-    if (!playlist?.songs) return;
-    const nextIndex = (currentIndex + 1) % playlist.songs.length;
-    setCurrentIndex(nextIndex);
+    if (playlist?.songs) {
+      const nextIndex = (currentIndex + 1) % (playlist.songs.length);
+      setCurrentIndex(nextIndex);
+      setCurrentSong(playlist.songs[nextIndex]?.song);
+    }
   };
 
   const handlePrevious = () => {
-    if (!playlist?.songs) return;
-    const prevIndex =
-      (currentIndex - 1 + playlist.songs.length) % playlist.songs.length;
-    setCurrentIndex(prevIndex);
+    if (playlist?.songs) {
+      const prevIndex = (currentIndex - 1 + playlist.songs.length) % playlist.songs.length;
+      setCurrentIndex(prevIndex);
+      setCurrentSong(playlist.songs[prevIndex]?.song);
+    }
   };
 
-  const currentSong = playlist?.songs?.[currentIndex]?.song;
+  useEffect(() => {
+    handleSongChange(currentSong?.songURL);
+  }, [currentSong]);
+
+  useEffect(() => {
+    handleSongChange(playlist?.songs[currentIndex]?.song.songURL);
+  }, [playlist, currentIndex]);
 
   return (
     <div className="h-24 border-t border-zinc-800 flex items-center justify-around">
       <CurrentSong
-        key={currentIndex}
-        artist={currentSong?.artist || ""}
+        key={currentSong?.id}
         songName={currentSong?.title || ""}
+        artist={currentSong?.artist || ""}
         cover={currentSong?.bannerSrc || undefined}
       />
       <SoundControls
@@ -64,6 +76,7 @@ export default function Player() {
         isLoading={isLoading}
         onNext={handleNext}
         onPrevious={handlePrevious}
+        disabled={!!currentSong?.songURL}
       />
       <VolumeControl volume={volume} onVolumeChange={handleVolumeChange} />
       <audio ref={audioRef} src={currentSong?.songURL || undefined} />
