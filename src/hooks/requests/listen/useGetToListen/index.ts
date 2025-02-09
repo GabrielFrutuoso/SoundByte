@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
 
-interface Song {
+export interface Song {
   id: string;
   title: string;
   artist: string;
   bannerSrc: string | undefined;
   songURL: string;
+  message: string;
 }
 
 const fetchSongToListen = async (
