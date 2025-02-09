@@ -6,12 +6,16 @@ import { VolumeControl } from "@/components/VolumeControl";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useGetToListen } from "@/hooks/requests/listen/useGetToListen";
 import { usePlaylistStore } from "@/store/playlistStore";
+import { useEffect } from "react";
 
 export default function Player() {
-  const { playlistId, singleSongId, index, increaseIndex, decreaseIndex } = usePlaylistStore();
-  console.log(`Fetching song with singleSongId: ${singleSongId}, playlistId: ${playlistId}, index: ${index}`);
+  const { playlistId, singleSongId, index, increaseIndex, decreaseIndex } =
+    usePlaylistStore();
+  console.log(
+    `Fetching song with singleSongId: ${singleSongId}, playlistId: ${playlistId}, index: ${index}`
+  );
   const validIndex = index !== undefined ? index : 0;
-  const { data: currentSong } = useGetToListen(undefined, "8607565e-f68f-462c-9d77-7cd8a83cde31", validIndex);
+  const { data } = useGetToListen(undefined, playlistId, validIndex);
 
   const {
     isPlaying,
@@ -32,16 +36,22 @@ export default function Player() {
     decreaseIndex();
   };
 
+  useEffect(() => {
+    if (data?.message) {
+      audioRef?.current?.pause();
+    }
+  }, [audioRef, data?.message, volume]);
+
   return (
     <div className="h-24 border-t border-zinc-800 flex items-center justify-around">
       <CurrentSong
-        key={currentSong?.id}
-        songName={currentSong?.title || ""}
-        artist={currentSong?.artist || ""}
-        cover={currentSong?.bannerSrc || ''}
+        key={data?.id}
+        songName={data?.title || ""}
+        artist={data?.artist || ""}
+        cover={data?.bannerSrc || ""}
       />
       <SoundControls
-        isPlaying={isPlaying}
+        isPlaying={isPlaying && data !== undefined}
         onPlayPause={handlePlayPause}
         currentTime={currentTime}
         duration={duration}
@@ -49,9 +59,10 @@ export default function Player() {
         isLoading={isLoading}
         onNext={onNext}
         onPrevious={onPrevious}
+        disabled={!!data?.message}
       />
       <VolumeControl volume={volume} onVolumeChange={handleVolumeChange} />
-      <audio ref={audioRef} src={currentSong?.songURL || undefined} />
+      <audio ref={audioRef} src={data?.songURL || undefined} />
     </div>
   );
 }
