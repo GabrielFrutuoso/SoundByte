@@ -22,6 +22,7 @@ export interface PlaylistItemProps {
   hideText?: boolean;
   layout?: number;
   username: string;
+  songIndex: number;
 }
 
 export const PlaylistItem = ({
@@ -33,10 +34,12 @@ export const PlaylistItem = ({
   layout,
   username,
 }: PlaylistItemProps & baseStyleProps) => {
-  const { playlistId, setPlaylistId } = usePlaylistStore();
+  const { playlistId, setPlaylistId, setSingleSongId, setIndex } = usePlaylistStore();
 
   const handlePlaylistSelect = (id: string | number) => {
     setPlaylistId(String(id));
+    setSingleSongId(undefined);
+    setIndex(0);
   };
 
   return (

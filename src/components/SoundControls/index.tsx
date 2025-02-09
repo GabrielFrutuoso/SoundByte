@@ -9,8 +9,8 @@ interface SoundControlsProps {
   duration: number;
   onSeek: (value: number) => void;
   isLoading?: boolean;
-  onNext: () => void;
-  onPrevious: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
 }
 
 export const SoundControls: React.FC<SoundControlsProps> = ({

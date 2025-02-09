@@ -1,23 +1,29 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-type Song = any; // Assuming Song type is defined elsewhere, if not, define it here
 type PlaylistStore = {
-  playlistId: string | null;
+  playlistId: string | undefined;
   setPlaylistId: (playlistId: string) => void;
-  singleSong: Song | null;
+  singleSongId: string | undefined;
+  setSingleSongId: (singleSongId: string) => void;
+  index: number | undefined;
+  setIndex: (index: number) => void;
+  increaseIndex: () => void;
+  decreaseIndex: () => void;
 };
 
 export const usePlaylistStore = create<PlaylistStore>()(
   persist(
     (set) => ({
-      playlistId: null,
-      singleSong: null,
+      playlistId: undefined,
+      singleSongId: undefined,
+      index: 0, 
       setPlaylistId: (playlistId) => set({ playlistId }),
-      setSingleSong: (singleSong: Song | null) => set({ singleSong }),
+      setSingleSongId: (singleSongId) => set({ singleSongId }),
+      setIndex: (index) => set({ index }),
+      increaseIndex: () => set((state) => ({ index: (state?.index ?? 0) + 1 })),
+      decreaseIndex: () => set((state) => ({ index: (state?.index ?? 0) - 1 })),
     }),
-    {
-      name: 'playlist-storage',
-    }
+    { name: 'playlist-storage' }
   )
 );
