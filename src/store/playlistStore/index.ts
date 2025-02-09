@@ -5,7 +5,7 @@ type PlaylistStore = {
   playlistId: string | undefined;
   setPlaylistId: (playlistId: string) => void;
   singleSongId: string | undefined;
-  setSingleSongId: (singleSongId: string) => void;
+  setSingleSongId: (singleSongId: string | undefined) => void;
   index: number | undefined;
   setIndex: (index: number) => void;
   increaseIndex: () => void;
