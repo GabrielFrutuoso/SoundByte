@@ -37,7 +37,7 @@ export default function Home() {
         <div className="flex flex-col">
           {user?.username && (
             <div className="grid grid-cols-4 gap-4 py-12">
-              {playlists?.map((playlist) => (
+              {playlists?.map((playlist, index) => (
                 <PlaylistItem
                   key={playlist.id}
                   {...playlist}
@@ -45,6 +45,7 @@ export default function Home() {
                   username={playlist.user.username}
                   hideText={true}
                   variant="menu"
+                  songIndex={index}
                 />
               ))}
             </div>

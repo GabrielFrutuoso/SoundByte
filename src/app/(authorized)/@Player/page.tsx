@@ -3,15 +3,19 @@
 import { CurrentSong } from "@/components/CurrentSong";
 import { SoundControls } from "@/components/SoundControls";
 import { VolumeControl } from "@/components/VolumeControl";
-import { useGetPlaylistById } from "@/hooks/requests/playlist/useGetPlaylistById";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { useGetToListen } from "@/hooks/requests/listen/useGetToListen";
 import { usePlaylistStore } from "@/store/playlistStore";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function Player() {
-  const { playlistId } = usePlaylistStore();
-  const { data: playlist } = useGetPlaylistById(playlistId as string);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const { playlistId, singleSongId, index, increaseIndex, decreaseIndex } =
+    usePlaylistStore();
+  console.log(
+    `Fetching song with singleSongId: ${singleSongId}, playlistId: ${playlistId}, index: ${index}`
+  );
+  const validIndex = index !== undefined ? index : 0;
+  const { data } = useGetToListen(undefined, playlistId, validIndex);
 
   const {
     isPlaying,
@@ -23,50 +27,42 @@ export default function Player() {
     handlePlayPause,
     handleSeek,
     handleVolumeChange,
-    handleSongChange,
   } = useAudioPlayer();
 
+  const onNext = () => {
+    increaseIndex();
+  };
+  const onPrevious = () => {
+    decreaseIndex();
+  };
+
   useEffect(() => {
-    if (playlist?.songs?.[currentIndex]?.song?.songURL) {
-      handleSongChange(playlist.songs[currentIndex].song.songURL);
+    if (data?.message) {
+      audioRef?.current?.pause();
     }
-  }, [playlist, currentIndex]);
-
-  const handleNext = () => {
-    if (!playlist?.songs) return;
-    const nextIndex = (currentIndex + 1) % playlist.songs.length;
-    setCurrentIndex(nextIndex);
-  };
-
-  const handlePrevious = () => {
-    if (!playlist?.songs) return;
-    const prevIndex =
-      (currentIndex - 1 + playlist.songs.length) % playlist.songs.length;
-    setCurrentIndex(prevIndex);
-  };
-
-  const currentSong = playlist?.songs?.[currentIndex]?.song;
+  }, [audioRef, data?.message, volume]);
 
   return (
     <div className="h-24 border-t border-zinc-800 flex items-center justify-around">
       <CurrentSong
-        key={currentIndex}
-        artist={currentSong?.artist || ""}
-        songName={currentSong?.title || ""}
-        cover={currentSong?.bannerSrc || undefined}
+        key={data?.id}
+        songName={data?.title || ""}
+        artist={data?.artist || ""}
+        cover={data?.bannerSrc || ""}
       />
       <SoundControls
-        isPlaying={isPlaying}
+        isPlaying={isPlaying && data !== undefined}
         onPlayPause={handlePlayPause}
         currentTime={currentTime}
         duration={duration}
         onSeek={handleSeek}
         isLoading={isLoading}
-        onNext={handleNext}
-        onPrevious={handlePrevious}
+        onNext={onNext}
+        onPrevious={onPrevious}
+        disabled={!!data?.message}
       />
       <VolumeControl volume={volume} onVolumeChange={handleVolumeChange} />
-      <audio ref={audioRef} src={currentSong?.songURL || undefined} />
+      <audio ref={audioRef} src={data?.songURL || undefined} />
     </div>
   );
 }
