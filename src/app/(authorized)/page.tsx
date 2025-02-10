@@ -7,15 +7,14 @@ import { useSession } from "next-auth/react";
 import { User, useUserStore } from "@/store/userStore";
 import { useFindUserByEmail } from "@/hooks/requests/user/useFindUserByEmail";
 import { useEffect } from "react";
-import { useGetPlaylists } from "@/hooks/requests/playlist/useGetPlaylists";
+import { useGetLikedPlaylists } from "@/hooks/requests/likedPlaylist/useGetLikedPlaylists";
 
 export default function Home() {
-  // const fakeArray = Array.from({ length: 8 }, (_, i) => i);
   const { data: session } = useSession();
   const { user, setUser } = useUserStore();
   const { data } = useFindUserByEmail(session?.user?.email || "");
 
-  const { data: playlists } = useGetPlaylists();
+  const { data: likedPlaylists } = useGetLikedPlaylists(user?.id || "");
 
   useEffect(() => {
     if (data) {
@@ -30,6 +29,7 @@ export default function Home() {
       setUser(userWithRequiredFields);
     }
   }, [data, setUser]);
+  console.log(likedPlaylists);
 
   return (
     <main className="h-full">
@@ -37,13 +37,12 @@ export default function Home() {
         <div className="flex flex-col">
           {user?.username && (
             <div className="grid grid-cols-4 gap-4 py-12">
-              {playlists?.map((playlist, index) => (
+              {likedPlaylists?.map(({playlist}, index) => (
                 <PlaylistItem
                   key={playlist.id}
                   {...playlist}
                   isPrivate={false}
-                  username={playlist.user.username}
-                  hideText={true}
+                  isInMenu={true}
                   variant="menu"
                   songIndex={index}
                 />

@@ -9,12 +9,14 @@ import { useSession } from "next-auth/react";
 import { Separator } from "../ui/separator";
 import { ResizablePanel } from "../ui/resizable";
 import { Button } from "../ui/button";
-import { useGetPlaylists } from "@/hooks/requests/playlist/useGetPlaylists";
+import { useGetLikedPlaylists } from "@/hooks/requests/likedPlaylist/useGetLikedPlaylists";
+import { useUserStore } from "@/store/userStore";
 
 export const SideBar = () => {
   const { data: session } = useSession();
   const [layout, setLayout] = useState(15);
-  const { data: playlist } = useGetPlaylists();
+  const { user } = useUserStore();
+  const { data: playlist } = useGetLikedPlaylists(user?.id || "");
 
   const handleLayoutChange = (size: number) => {
     return layout === 4.5 ? setLayout(size) : setLayout(4.5);
@@ -64,13 +66,14 @@ export const SideBar = () => {
         <Separator className="my-2" orientation="horizontal" />
         {session?.user && (
           <ScrollArea className="h-[640px] w-full flex flex-col justify-center items-center gap-4 px-4">
-            {playlist?.map((playlist) => (
+            {playlist?.map(({playlist}, index) => (
               <PlaylistItem
                 key={playlist.id}
-                username={playlist.user.username}
-                isPrivate={false}
-                layout={layout}
                 {...playlist}
+                isPrivate={false}
+                isInMenu={false}
+                variant="default"
+                songIndex={index}
               />
             ))}
           </ScrollArea>
