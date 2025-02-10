@@ -12,20 +12,12 @@ import {
 import { useGetPlaylistById } from "@/hooks/requests/playlist/useGetPlaylistById";
 import { Ellipsis, Heart, Music, Play } from "lucide-react";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-export default function Playlist() {
-  const [playlistId, setPlaylistId] = useState<string>("");
+export default function Playlist({ params }: { params: { id: string } }) {
+  const { id } = params;
 
-  useEffect(() => {
-    const storedPlaylistId = typeof window !== "undefined" ? localStorage.getItem('playlistId') : null;
-    if (storedPlaylistId) {
-      setPlaylistId(JSON.parse(storedPlaylistId || '{"playlistId": ""}').playlistId);
-    }
-  }, []);
-
-  const { data: playlist } = useGetPlaylistById(playlistId);
-  console.log("playlist: ", playlist);
+  const { data: playlist } = useGetPlaylistById(id as string);
 
   return (
     <div className="h-full flex flex-col px-12 pt-12 space-y-4">
@@ -67,19 +59,19 @@ export default function Playlist() {
           </TableHeader>
           <TableBody>
             {playlist?.songs.map((song, index) => (
-                <TableRow
-                  key={song?.song?.id}
-                  className="hover:bg-zinc-800 text-lg font-semibold cursor-pointer"
-                >
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{song?.song?.title}</TableCell>
-                  <TableCell>{song?.song?.artist}</TableCell>
-                  <TableCell>{song?.song?.user?.username}</TableCell>
-                  <TableCell>
-                    {new Date(song?.song?.createdAt).toLocaleDateString()}
-                  </TableCell>
-                </TableRow>
-              ))}
+              <TableRow
+                key={song?.song?.id}
+                className="hover:bg-zinc-800 text-lg font-semibold cursor-pointer"
+              >
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{song?.song?.title}</TableCell>
+                <TableCell>{song?.song?.artist}</TableCell>
+                <TableCell>{song?.song?.user?.username}</TableCell>
+                <TableCell>
+                  {new Date(song?.song?.createdAt).toLocaleDateString()}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       ) : (
