@@ -23,13 +23,14 @@ export default function Home() {
         email: data.email,
         username: data.username,
         avatar: data.avatar || "",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        likedPlaylists: data.likedPlaylists || [],
+        likedSongs: data.likedSongs || [],
       };
       setUser(userWithRequiredFields);
     }
   }, [data, setUser]);
-  console.log(likedPlaylists);
+
+  console.log("user: ", data?.likedPlaylists);
 
   return (
     <main className="h-full">
@@ -37,7 +38,7 @@ export default function Home() {
         <div className="flex flex-col">
           {user?.username && (
             <div className="grid grid-cols-4 gap-4 py-12">
-              {likedPlaylists?.map(({playlist}, index) => (
+              {likedPlaylists?.map(({ playlist }, index) => (
                 <PlaylistItem
                   key={playlist.id}
                   {...playlist}

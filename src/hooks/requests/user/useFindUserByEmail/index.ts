@@ -1,15 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 
-type UserData = {
-  username: string;
+export type User = {
   id: string;
+  username: string;
   email: string;
-  name: string;
-  avatar?: string;
-
+  avatar: string;
+  createdAt?: string;
+  updatedAt?: string;
+  likedPlaylists: Array<{
+    playlist: {
+      id: string;
+    };
+  }>;
+  likedSongs: Array<{
+    song: {
+      id: string;
+    };
+  }>;
 };
 
-const fetchUserByEmail = async (email: string): Promise<UserData | null> => {
+
+const fetchUserByEmail = async (email: string): Promise<User | null> => {
   if (!email) return null;
 
   const response = await fetch(`http://localhost:3000/api/user?email=${email}`);

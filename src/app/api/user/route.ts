@@ -21,6 +21,24 @@ export async function GET(request: Request) {
         avatar: true,
         createdAt: true,
         updatedAt: true,
+        likedPlaylists: {
+          select: {
+            playlist: {
+              select: {
+                id: true
+              },
+            },
+          },
+        },
+        likedSongs: {
+          select: {
+            song: {
+              select: {
+                id: true
+              },
+            },
+          },
+        },
       },
     });
 
