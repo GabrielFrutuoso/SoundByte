@@ -13,23 +13,26 @@ import { useGetPlaylistById } from "@/hooks/requests/playlist/useGetPlaylistById
 import { Ellipsis, Heart, Music, Play } from "lucide-react";
 import Image from "next/image";
 import React from "react";
+import { useSearchParams } from "next/navigation";
 
-export default function Playlist({ params }: { params: { id: string } }) {
-  const { id } = params;
-
+export default function Playlist() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const { data: playlist } = useGetPlaylistById(id as string);
 
   return (
     <div className="h-full flex flex-col px-12 pt-12 space-y-4">
       <div className="flex items-center gap-4">
-        <Image
-          className="rounded-lg aspect-square object-cover"
-          draggable={false}
-          src={playlist?.bannerSrc as string}
-          width={200}
-          height={200}
-          alt="Album cover"
-        />
+        {playlist?.bannerSrc && (
+          <Image
+            className="rounded-lg aspect-square object-cover"
+            draggable={false}
+            src={playlist?.bannerSrc as string}
+            width={200}
+            height={200}
+            alt="Album cover"
+          />
+        )}
         <div className="flex flex-col gap-3">
           <div>
             <h1 className="text-4xl font-bold">{playlist?.title}</h1>
