@@ -12,6 +12,7 @@ import {
   ContextMenuTrigger,
 } from "../ui/context-menu";
 import { usePlaylistStore } from "@/store/playlistStore";
+import { toast } from "@/hooks/use-toast";
 
 export interface PlaylistItemProps {
   id: string | number;
@@ -81,7 +82,18 @@ export const PlaylistItem = ({
       </ContextMenuTrigger>
 
       <ContextMenuContent>
-        <ContextMenuItem>Compartilhar</ContextMenuItem>
+        <ContextMenuItem
+          onClick={() => {
+            const url = `${window.location.origin}/playlist?id=${id}`;
+            navigator.clipboard.writeText(url);
+            toast({
+              title: "Copiado para a área de transferência",
+              description: "Use Ctrl + V para colar o link",
+            })
+          }}
+        >
+          Compartilhar
+        </ContextMenuItem>
         <ContextMenuItem>Descurtir</ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
