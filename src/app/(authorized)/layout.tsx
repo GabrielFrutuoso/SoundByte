@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/resizable";
 import { SideBar } from "@/components/SideBar";
 import { Header } from "@/components/Header";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "SoundByte",
@@ -24,8 +25,8 @@ export default function RootLayout({
     <>
       <Header />
       <ResizablePanelGroup direction="horizontal">
-        
-          <SideBar />
+        <Toaster />
+        <SideBar />
         <ResizableHandle />
         <ResizablePanel>{children}</ResizablePanel>
       </ResizablePanelGroup>
