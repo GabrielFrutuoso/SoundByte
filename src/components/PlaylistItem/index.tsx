@@ -19,9 +19,8 @@ export interface PlaylistItemProps {
   bannerSrc: string;
   isPrivate: boolean;
   variant?: string;
-  hideText?: boolean;
+  isInMenu?: boolean;
   layout?: number;
-  username: string;
   songIndex: number;
 }
 
@@ -30,11 +29,11 @@ export const PlaylistItem = ({
   title,
   bannerSrc,
   variant,
-  hideText,
+  isInMenu,
   layout,
-  username,
 }: PlaylistItemProps & baseStyleProps) => {
-  const { playlistId, setPlaylistId, setSingleSongId, setIndex } = usePlaylistStore();
+  const { playlistId, setPlaylistId, setSingleSongId, setIndex } =
+    usePlaylistStore();
 
   const handlePlaylistSelect = (id: string | number) => {
     setPlaylistId(String(id));
@@ -51,15 +50,16 @@ export const PlaylistItem = ({
             className: `${playlistId === String(id) ? "text-lime-500" : ""}`,
           })}
         >
-          <div onClick={() => handlePlaylistSelect(id)} className="relative group">
-            <button
-              className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg"
-            >
+          <div
+            onClick={() => handlePlaylistSelect(id)}
+            className="relative group"
+          >
+            <button className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg">
               <Play />
             </button>
             <Image
               className={` ${
-                hideText && "w-20"
+                isInMenu && "w-20"
               } rounded-lg aspect-square object-cover`}
               draggable={false}
               src={bannerSrc}
@@ -71,12 +71,9 @@ export const PlaylistItem = ({
           {layout !== 4.5 && (
             <Link className="w-full" href={`/${id}/playlist`}>
               <div
-                className={`flex flex-col ${hideText && "text-lg font-bold"}`}
+                className={`flex flex-col ${isInMenu && "text-lg font-bold"}`}
               >
                 <h1>{title}</h1>
-                <p className={`${hideText && "hidden"}`}>
-                  playlist - {username}
-                </p>
               </div>
             </Link>
           )}
