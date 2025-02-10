@@ -5,6 +5,7 @@ type PlaylistData = {
     title: string;
     bannerSrc: string;
     isPrivate: boolean;
+    userUUID: string;
   };
   
   export const usePostPlaylist = () => {
