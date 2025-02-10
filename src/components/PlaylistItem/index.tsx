@@ -13,9 +13,10 @@ import {
 } from "../ui/context-menu";
 import { usePlaylistStore } from "@/store/playlistStore";
 import { toast } from "@/hooks/use-toast";
+import { useUserStore } from "@/store/userStore";
 
 export interface PlaylistItemProps {
-  id: string | number;
+  id: string;
   title: string;
   bannerSrc: string;
   isPrivate: boolean;
@@ -36,10 +37,27 @@ export const PlaylistItem = ({
   const { playlistId, setPlaylistId, setSingleSongId, setIndex } =
     usePlaylistStore();
 
-  const handlePlaylistSelect = (id: string | number) => {
-    setPlaylistId(String(id));
+  const { user: currentUser } = useUserStore();
+
+  const handlePlaylistSelect = (id: string) => {
+    setPlaylistId(id);
     setSingleSongId(undefined);
     setIndex(0);
+  };
+
+  const handleLike = () => {
+    const likedPlaylists = currentUser?.likedPlaylists;
+    if (
+      !likedPlaylists?.some((likedPlaylist) => likedPlaylist.playlist.id === id)
+    ) {
+      toast({
+        title: "Curtido com sucesso",
+      });
+    } else {
+      toast({
+        title: "Descurtido com sucesso",
+      });
+    }
   };
 
   return (
@@ -48,7 +66,7 @@ export const PlaylistItem = ({
         <div
           className={baseStyle({
             variant,
-            className: `${playlistId === String(id) ? "text-lime-500" : ""}`,
+            className: `${playlistId === id ? "text-lime-500" : ""}`,
           })}
         >
           <div
@@ -80,7 +98,6 @@ export const PlaylistItem = ({
           )}
         </div>
       </ContextMenuTrigger>
-
       <ContextMenuContent>
         <ContextMenuItem
           onClick={() => {
@@ -89,12 +106,18 @@ export const PlaylistItem = ({
             toast({
               title: "Copiado para a área de transferência",
               description: "Use Ctrl + V para colar o link",
-            })
+            });
           }}
         >
           Compartilhar
         </ContextMenuItem>
-        <ContextMenuItem>Descurtir</ContextMenuItem>
+        <ContextMenuItem onClick={handleLike}>
+          {currentUser?.likedPlaylists?.some(
+            (likedPlaylist) => likedPlaylist.playlist.id === id
+          )
+            ? "descurtir :("
+            : "curtir <3"}
+        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   );
