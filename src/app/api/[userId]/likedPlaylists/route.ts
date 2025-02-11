@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { userId: string } }
 ) {
   try {
-    const userId = params.userId;
+    const userId = await params.userId;
     if (userId === "undefined") {
       return NextResponse.json(
         { error: "User ID is required" },

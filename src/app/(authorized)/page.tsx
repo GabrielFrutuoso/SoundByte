@@ -30,8 +30,6 @@ export default function Home() {
     }
   }, [data, setUser]);
 
-  console.log("user: ", data?.likedPlaylists);
-
   return (
     <main className="h-full">
       <ScrollArea className="h-full px-12">
