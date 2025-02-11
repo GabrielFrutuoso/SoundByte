@@ -5,7 +5,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: { unlikeTo: string } }
 ) {
-  const unlikeTo = params.unlikeTo;
+  const unlikeTo = await params.unlikeTo;
 
   if (unlikeTo === "unlikePlaylist") {
     const { userId, playlistId } = await request.json();
