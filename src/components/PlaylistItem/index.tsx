@@ -14,6 +14,8 @@ import {
 import { usePlaylistStore } from "@/store/playlistStore";
 import { toast } from "@/hooks/use-toast";
 import { useUserStore } from "@/store/userStore";
+import { useUnlikePlaylist } from "@/hooks/requests/like/useUnlikePlaylist";
+import { useLikePlaylist } from "@/hooks/requests/like/useLikePlaylist";
 
 export interface PlaylistItemProps {
   id: string;
@@ -45,18 +47,17 @@ export const PlaylistItem = ({
     setIndex(0);
   };
 
-  const handleLike = () => {
+  const { mutate: likePlaylist } = useLikePlaylist();
+  const { mutate: unlikePlaylist } = useUnlikePlaylist();
+
+  const handleLike = async () => {
     const likedPlaylists = currentUser?.likedPlaylists;
     if (
       !likedPlaylists?.some((likedPlaylist) => likedPlaylist.playlist.id === id)
     ) {
-      toast({
-        title: "Curtido com sucesso",
-      });
+      likePlaylist({ playlistId: id, userId: currentUser?.id || "" });
     } else {
-      toast({
-        title: "Descurtido com sucesso",
-      });
+      unlikePlaylist({ playlistId: id, userId: currentUser?.id || "" });
     }
   };
 
