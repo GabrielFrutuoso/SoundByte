@@ -1,70 +1,66 @@
 "use client";
 
-// import { SongItem } from "@/components/SongItem";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { useSearchParams } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useQueryState } from "nuqs";
+import { Button } from "@/components/ui/button";
+import { useSearch } from "@/hooks/requests/search/useSearch";
+import { SearchResultItem } from "@/components/SearchResultItem";
+import { SearchResultType } from "@/app/types/SearchResult.type";
 
 export default function Search() {
-  // const fakeArray = Array.from({ length: 36 }, (_, i) => i);
-  const searchParams = useSearchParams();
+  const [type, setType] = useState("song");
+  const [query] = useQueryState("query");
+
+  useEffect(() => {
+    setType("song");
+  }, []);
+
+  const { data: result } = useSearch(query || "", type || "");
+
+  console.log(result?.data);
 
   return (
     <div className="h-full flex flex-col">
       <div className="flex gap-2 p-4 border-b border-zinc-800">
         <Button
-          variant={
-            searchParams.get("type") === "tracks" ? "default" : "outline"
-          }
+          onClick={() => setType("song")}
+          variant={type === "song" ? "default" : "ghost"}
+          size="default"
         >
           Músicas
         </Button>
+
         <Button
-          variant={
-            searchParams.get("type") === "playlists" ? "default" : "outline"
-          }
+          onClick={() => setType("playlist")}
+          variant={type === "playlist" ? "default" : "ghost"}
+          size="default"
         >
           Playlists
         </Button>
-        <Separator orientation="vertical" />
-
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Gênero" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="rock">Rock</SelectItem>
-            <SelectItem value="pop">Pop</SelectItem>
-            <SelectItem value="rap">Rap</SelectItem>
-          </SelectContent>
-        </Select>
+        {query && (
+          <h1 className="text-xl font-bold">
+            Resultados para: <span className="text-lime-500">{query}</span>
+          </h1>
+        )}
       </div>
-      <ScrollArea>
-        <div className="flex flex-wrap gap-6 items-center justify-center p-6">
-          {/* {fakeArray.map((_, i) => (
-            <SongItem
-              key={i + "teste"}
-              id={""}
-              title={""}
-              artist={""}
-              bannerSrc={""}
-              songURL={""}
-              isPrivate={false}
-              createdAt={undefined}
-              updatedAt={undefined}
-              userUUID={""}
-              genreId={0}
-            />
-          ))} */}
+      <ScrollArea className="h-full">
+        <div className="flex flex-wrap flex-1 h-full gap-6 p-6">
+          {result?.data?.map((item: SearchResultType) =>
+            type === "song" ? (
+              <SearchResultItem
+                key={item?.id}
+                result={item}
+                type={"song"}
+              />
+            ) : (
+              <SearchResultItem
+                key={item?.id}
+                result={item}
+                type={"playlist"}
+              />
+            )
+          )}
         </div>
       </ScrollArea>
     </div>
