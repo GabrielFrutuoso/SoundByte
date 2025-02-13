@@ -1,72 +1,107 @@
 "use client";
 
-// import { SongItem } from "@/components/SongItem";
+import React, { useEffect, useState } from "react";
+import { useQueryState } from "nuqs";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useSearch } from "@/hooks/requests/search/useSearch";
+import { SearchResultItem } from "@/components/SearchResultItem";
+import { SearchResultType } from "@/app/types/SearchResult.type";
 import { Separator } from "@/components/ui/separator";
-import { useSearchParams } from "next/navigation";
-import React from "react";
+import { Pagination } from "@/components/Pagination";
+import { SearchResultSkeleton } from "@/components/SearchResultItem/Skeleton";
+import { toast } from "@/hooks/use-toast";
 
 export default function Search() {
-  // const fakeArray = Array.from({ length: 36 }, (_, i) => i);
-  const searchParams = useSearchParams();
+  const [type, setType] = useState("song");
+  const [query] = useQueryState("query");
+  const [page, setPage] = useQueryState("page");
+
+  useEffect(() => {
+    setType("song");
+  }, []);
+
+  const {
+    data: result,
+    isLoading,
+    error,
+  } = useSearch(query || "", type || "song", Number(page || 1), 3);
+
+  console.log(result?.data);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(String(newPage));
+  };
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch search results",
+        variant: "destructive",
+      });
+    }
+  }, [error]);
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex gap-2 p-4 border-b border-zinc-800">
-        <Button
-          variant={
-            searchParams.get("type") === "tracks" ? "default" : "outline"
-          }
-        >
-          Músicas
-        </Button>
-        <Button
-          variant={
-            searchParams.get("type") === "playlists" ? "default" : "outline"
-          }
-        >
-          Playlists
-        </Button>
-        <Separator orientation="vertical" />
+    <div className="h-full flex flex-col pb-4">
+      <div className="w-full flex justify-between gap-2 p-4 border-b border-zinc-800">
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setType("song")}
+            variant={type === "song" ? "default" : "ghost"}
+            size="default"
+          >
+            Músicas
+          </Button>
 
-        <Select>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Gênero" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="rock">Rock</SelectItem>
-            <SelectItem value="pop">Pop</SelectItem>
-            <SelectItem value="rap">Rap</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <ScrollArea>
-        <div className="flex flex-wrap gap-6 items-center justify-center p-6">
-          {/* {fakeArray.map((_, i) => (
-            <SongItem
-              key={i + "teste"}
-              id={""}
-              title={""}
-              artist={""}
-              bannerSrc={""}
-              songURL={""}
-              isPrivate={false}
-              createdAt={undefined}
-              updatedAt={undefined}
-              userUUID={""}
-              genreId={0}
-            />
-          ))} */}
+          <Button
+            onClick={() => setType("playlist")}
+            variant={type === "playlist" ? "default" : "ghost"}
+            size="default"
+          >
+            Playlists
+          </Button>
+          {query && (
+            <>
+              <Separator orientation="vertical" />
+              <h1 className="text-xl font-bold">
+                Resultados para: <span className="text-lime-500">{query}</span>
+              </h1>
+            </>
+          )}
         </div>
-      </ScrollArea>
+        <Pagination
+          currentPage={Number(page || 1)}
+          totalPages={result?.data?.totalPages || 1}
+          setPage={handlePageChange}
+        />
+      </div>
+      <div className="grid grid-cols-6 gap-7 mx-auto py-12">
+        {result?.data?.songs &&
+          result?.data?.songs?.map((item: SearchResultType) => (
+            <SearchResultItem key={item?.id} result={item} type={"song"} />
+          ))}
+        {result?.data?.playlists &&
+          result?.data?.playlists?.map((item: SearchResultType) => (
+            <SearchResultItem key={item?.id} result={item} type={"playlist"} />
+          ))}
+        {isLoading && (
+          <>
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -91,7 +91,10 @@ export const PlaylistItem = ({
           {layout !== 4.5 && (
             <Link className="w-full" href={`/playlist?id=${id}`}>
               <div
-                className={`flex flex-col ${isInMenu && "text-lg font-bold"}`}
+                title={title}
+                className={`flex flex-col ${
+                  isInMenu && "text-lg font-bold"
+                } text-ellipsis overflow-hidden whitespace-nowrap`}
               >
                 <h1>{title}</h1>
               </div>
