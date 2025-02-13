@@ -8,6 +8,8 @@ import { SearchResultItem } from "@/components/SearchResultItem";
 import { SearchResultType } from "@/app/types/SearchResult.type";
 import { Separator } from "@/components/ui/separator";
 import { Pagination } from "@/components/Pagination";
+import { SearchResultSkeleton } from "@/components/SearchResultItem/Skeleton";
+import { toast } from "@/hooks/use-toast";
 
 export default function Search() {
   const [type, setType] = useState("song");
@@ -18,19 +20,27 @@ export default function Search() {
     setType("song");
   }, []);
 
-  const { data: result } = useSearch(
-    query || "",
-    type || "song",
-    Number(page || 1),
-    12
-  );
+  const {
+    data: result,
+    isLoading,
+    error,
+  } = useSearch(query || "", type || "song", Number(page || 1), 3);
 
   console.log(result?.data);
 
-  // Wrap setPage to convert its type
   const handlePageChange = (newPage: number) => {
     setPage(String(newPage));
   };
+
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch search results",
+        variant: "destructive",
+      });
+    }
+  }, [error]);
 
   return (
     <div className="h-full flex flex-col pb-4">
@@ -75,6 +85,22 @@ export default function Search() {
           result?.data?.playlists?.map((item: SearchResultType) => (
             <SearchResultItem key={item?.id} result={item} type={"playlist"} />
           ))}
+        {isLoading && (
+          <>
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+            <SearchResultSkeleton />
+          </>
+        )}
       </div>
     </div>
   );
