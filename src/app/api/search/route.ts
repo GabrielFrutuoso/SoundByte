@@ -1,11 +1,17 @@
 import { prisma } from "@/lib/PrismaClient";
+import {  } from "@prisma/client";
 import { NextResponse } from "next/server";
+
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q") || "";
     const type = searchParams.get("type") || "";
+    const page = parseInt(searchParams.get("page") || "1");
+    const pageSize = parseInt(searchParams.get("pageSize") || "10");
+
+    const skip = (page - 1) * pageSize;
 
     switch (type) {
       case "song":
@@ -40,9 +46,35 @@ export async function GET(request: Request) {
             createdAt: true,
             updatedAt: true,
           },
+          skip,
+          take: pageSize,
         });
-
-        return NextResponse.json(songs, { status: 200 });
+        const totalItems = await prisma.song.count({
+          where: {
+            isPrivate: false,
+            OR: [
+              {
+                title: {
+                  contains: query,
+                },
+              },
+              {
+                artist: {
+                  contains: query,
+                },
+              },
+              {
+                genre: {
+                  title: {
+                    contains: query,
+                  },
+                },
+              },
+            ],
+          },
+        });
+        const totalPages = Math.ceil(totalItems / pageSize);
+        return NextResponse.json({ songs, totalItems, totalPages }, { status: 200 });
       case "playlist":
         const playlists = await prisma.playlist.findMany({
           where: {
@@ -55,8 +87,23 @@ export async function GET(request: Request) {
               },
             ],
           },
+          skip,
+          take: pageSize,
         });
-        return NextResponse.json(playlists, { status: 200 });
+        const totalPlaylistItems = await prisma.playlist.count({
+          where: {
+            isPrivate: false,
+            OR: [
+              {
+                title: {
+                  contains: query,
+                },
+              },
+            ],
+          },
+        });
+        const totalPlaylistPages = Math.ceil(totalPlaylistItems / pageSize);
+        return NextResponse.json({ playlists, totalPlaylistItems, totalPlaylistPages }, { status: 200 });
     }
   } catch (err) {
     console.error(err);
