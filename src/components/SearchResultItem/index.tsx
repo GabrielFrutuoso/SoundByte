@@ -35,7 +35,7 @@ export const SearchResultItem = ({
           : ""
       }`}
     >
-      <div className="relative">
+      <div className="relative w-64 aspect-square">
         <button
           onClick={() => handleSongSelect(result.id)}
           className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg"
@@ -43,10 +43,10 @@ export const SearchResultItem = ({
           <Play size={40} />
         </button>
         <Image
-          className="w-full object-cover aspect-square rounded-lg"
+          className="object-cover aspect-square rounded-lg"
           draggable={false}
-          width={500}
-          height={500}
+          width={550}
+          height={550}
           src={result?.bannerSrc}
           priority
           alt="Album cover"
