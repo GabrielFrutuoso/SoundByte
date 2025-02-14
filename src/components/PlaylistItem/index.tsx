@@ -24,8 +24,8 @@ export interface PlaylistItemProps {
   isPrivate: boolean;
   variant?: string;
   isInMenu?: boolean;
-  layout?: number;
   songIndex: number;
+  isCollapsed?: boolean;
 }
 
 export const PlaylistItem = ({
@@ -34,7 +34,7 @@ export const PlaylistItem = ({
   bannerSrc,
   variant,
   isInMenu,
-  layout,
+  isCollapsed,
 }: PlaylistItemProps & baseStyleProps) => {
   const { playlistId, setPlaylistId, setSingleSongId, setIndex } =
     usePlaylistStore();
@@ -88,7 +88,7 @@ export const PlaylistItem = ({
               alt="Album cover"
             />
           </div>
-          {layout !== 4.5 && (
+          {!isCollapsed && (
             <Link className="w-full" href={`/playlist?id=${id}`}>
               <div
                 title={title}

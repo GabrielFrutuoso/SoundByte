@@ -28,39 +28,39 @@ export const SearchResultItem = ({
 
   return (
     <div
-      className={`flex flex-col gap-2 w-60 cursor-pointer group ${
+      className={`flex flex-col gap-2 w-full cursor-pointer group ${
         (singleSongId === result.id && type === "song") ||
         (playlistId === result.id && type === "playlist")
           ? "text-lime-500"
           : ""
       }`}
     >
-      <div className="relative w-64 aspect-square">
+      <div className="relative w-full aspect-square">
         <button
           onClick={() => handleSongSelect(result.id)}
-          className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg"
+          className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg z-10"
         >
-          <Play size={40} />
+          <Play className="w-8 h-8 sm:w-10 sm:h-10" />
         </button>
         <Image
           className="object-cover aspect-square rounded-lg"
           draggable={false}
-          width={550}
-          height={550}
           src={result?.bannerSrc}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
           priority
           alt="Album cover"
         />
       </div>
 
-      <div>
+      <div className="w-full">
         <p
           title={result?.title}
-          className="text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap"
+          className="text-base sm:text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap"
         >
           {result?.title}
         </p>
-        <p className="text-sm font-thin opacity-75 text-ellipsis overflow-hidden whitespace-nowrap">
+        <p className="text-xs sm:text-sm font-thin opacity-75 text-ellipsis overflow-hidden whitespace-nowrap">
           {result?.artist}
         </p>
       </div>

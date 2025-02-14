@@ -3,14 +3,14 @@
 import React, { useState } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import Link from "next/link";
-import { HomeIcon, PanelLeft, Search, Settings } from "lucide-react";
+import { HomeIcon, Search, Settings } from "lucide-react";
 import { PlaylistItem } from "../PlaylistItem";
 import { useSession } from "next-auth/react";
 import { Separator } from "../ui/separator";
 import { ResizablePanel } from "../ui/resizable";
-import { Button } from "../ui/button";
 import { useGetLikedPlaylists } from "@/hooks/requests/likedPlaylist/useGetLikedPlaylists";
 import { useUserStore } from "@/store/userStore";
+import { PlaylistItemSkeleton } from "../PlaylistItem/Skeleton";
 
 export const SideBar = () => {
   const { data: session } = useSession();
@@ -18,40 +18,38 @@ export const SideBar = () => {
   const { user } = useUserStore();
   const { data: playlist } = useGetLikedPlaylists(user?.id || "");
 
-  const handleLayoutChange = (size: number) => {
-    return layout === 4.5 ? setLayout(size) : setLayout(4.5);
+  const handleResizePanel = (size: number) => {
+    setLayout(size);
   };
 
+  const isCollapsed = layout <= 7;
+
   return (
-    <ResizablePanel defaultSize={layout} minSize={layout} maxSize={layout}>
+    <ResizablePanel
+      defaultSize={layout}
+      minSize={4.5}
+      maxSize={30}
+      onResize={handleResizePanel}
+    >
       <div className="flex flex-col">
         <ul
           className={`flex flex-col ${
-            layout === 4.5 ? "items-center justify-center" : ""
-          }  gap-2 px-4 pt-4`}
+            isCollapsed ? "items-center justify-center" : ""
+          } gap-2 px-4 pt-4`}
         >
-          <Button
-            onClick={() => handleLayoutChange(15)}
-            variant="ghost"
-            className="text-zinc-400 cursor-pointer flex items-center"
-          >
-            <PanelLeft className="text-zinc-400 " size={25} />
-            {layout !== 4.5 && <span>Mudar Layout</span>}
-          </Button>
-
           <Link
             className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
             href="/"
           >
             <HomeIcon />
-            {layout !== 4.5 && <span>Home</span>}
+            {!isCollapsed && <span>Home</span>}
           </Link>
           <Link
             className="flex items-center gap-2 inset-0 hover:bg-zinc-800 py-1 rounded-md px-1"
             href="/search"
           >
             <Search />
-            {layout !== 4.5 && <span>Search</span>}
+            {!isCollapsed && <span>Search</span>}
           </Link>
           {session?.user && (
             <Link
@@ -59,23 +57,24 @@ export const SideBar = () => {
               href="/settings"
             >
               <Settings />
-              {layout !== 4.5 && <span>Settings</span>}
+              {!isCollapsed && <span>Settings</span>}
             </Link>
           )}
         </ul>
         <Separator className="my-2" orientation="horizontal" />
         {session?.user && (
           <ScrollArea className="h-[640px] w-full flex flex-col justify-center items-center gap-4 px-4">
-            {playlist?.map(({playlist}, index) => (
+            {playlist?.map(({ playlist }, index) => (
               <PlaylistItem
                 key={playlist.id}
                 {...playlist}
                 isPrivate={false}
                 isInMenu={false}
-                variant="default"
+                isCollapsed={isCollapsed}
                 songIndex={index}
               />
             ))}
+            <PlaylistItemSkeleton isInMenu={false} />
           </ScrollArea>
         )}
       </div>

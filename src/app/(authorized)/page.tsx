@@ -8,13 +8,16 @@ import { User, useUserStore } from "@/store/userStore";
 import { useFindUserByEmail } from "@/hooks/requests/user/useFindUserByEmail";
 import { useEffect } from "react";
 import { useGetLikedPlaylists } from "@/hooks/requests/likedPlaylist/useGetLikedPlaylists";
+import { PlaylistItemSkeleton } from "@/components/PlaylistItem/Skeleton";
 
 export default function Home() {
   const { data: session } = useSession();
   const { user, setUser } = useUserStore();
   const { data } = useFindUserByEmail(session?.user?.email || "");
 
-  const { data: likedPlaylists } = useGetLikedPlaylists(user?.id || "");
+  const { data: likedPlaylists, isLoading } = useGetLikedPlaylists(
+    user?.id || ""
+  );
 
   useEffect(() => {
     if (data) {
@@ -46,6 +49,16 @@ export default function Home() {
                   songIndex={index}
                 />
               ))}
+              {isLoading && (
+                <>
+                  <PlaylistItemSkeleton />
+                  <PlaylistItemSkeleton />
+                  <PlaylistItemSkeleton />
+                  <PlaylistItemSkeleton />
+                  <PlaylistItemSkeleton />
+                  <PlaylistItemSkeleton />
+                </>
+              )}
             </div>
           )}
           <SongGroup
