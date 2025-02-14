@@ -36,7 +36,7 @@ export const SideBar = () => {
         <ul
           className={`flex flex-col ${
             isCollapsed ? "items-center justify-center" : ""
-          } gap-2 px-4 pt-4`}
+          } px-4 pt-4`}
         >
           <Button
             asChild
@@ -80,9 +80,7 @@ export const SideBar = () => {
         {session?.user && (
           <ScrollArea className="flex-1 px-4">
             <div
-              className={`flex flex-col ${
-                isCollapsed ? "items-center" : ""
-              } gap-4`}
+              className={`flex flex-col ${isCollapsed ? "items-center" : ""}`}
             >
               {isLoading
                 ? Array.from({ length: 12 }).map((_, i) => (
