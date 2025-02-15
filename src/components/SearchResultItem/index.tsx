@@ -6,6 +6,7 @@ import { SearchResultType } from "@/app/types/SearchResult.type";
 import { useUserStore } from "@/store/userStore";
 import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
 import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist";
+import { useGetLikedPlaylists } from "@/hooks/requests/likedPlaylist/useGetLikedPlaylists";
 
 export const SearchResultItem = ({
   result,
@@ -21,14 +22,18 @@ export const SearchResultItem = ({
   const { user } = useUserStore();
 
   const [isLiked, setIsLiked] = useState(false);
-
+  const { data: likedPlaylists } = useGetLikedPlaylists(
+    user?.id || ""
+  );
   useEffect(() => {
-    const liked = user?.likedPlaylists?.find(
+    const liked = likedPlaylists?.find(
       (likedPlaylist) => likedPlaylist.playlist.id === result.id
     );
     setIsLiked(!!liked);
-  }, [user?.likedPlaylists, result.id]);
- 
+  }, [likedPlaylists, result.id]);
+ console.log("liked", likedPlaylists?.find(
+  (likedPlaylist) => likedPlaylist.playlist.id === result.id
+))
   const handleSongSelect = (id: string | number) => {
     if (type === "song") {
       setPlaylistId("");
