@@ -11,13 +11,19 @@ export const useDisikePlaylist = () => {
 
   return useMutation({
     mutationFn: async ({ playlistId, userId }: DislikePlaylistParams) => {
-      const { data } = await apiClient.post(`/api/playlist/${playlistId}/dislike`, {
-        userId,
-      });
+      const { data } = await apiClient.post(
+        `/api/playlist/${playlistId}/dislike`,
+        {
+          userId,
+        }
+      );
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["likedPlaylists"] });
+      queryClient.invalidateQueries({
+        queryKey: ["user"],
+      });
     },
   });
 };
