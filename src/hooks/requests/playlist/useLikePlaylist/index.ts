@@ -22,9 +22,6 @@ export const useLikePlaylist = () => {
       queryClient.invalidateQueries({
         queryKey: ['likedPlaylists', variables.userId],
       });
-      queryClient.invalidateQueries({
-        queryKey: ['user'],
-      });
     },
   });
 };

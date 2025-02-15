@@ -21,9 +21,6 @@ export const useDisikePlaylist = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["likedPlaylists"] });
-      queryClient.invalidateQueries({
-        queryKey: ["user"],
-      });
     },
   });
 };
