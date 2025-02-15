@@ -6,18 +6,18 @@ interface LikePlaylistRequest {
   playlistId: string;
 }
 
-const likePlaylist = async ({ userId, playlistId }: LikePlaylistRequest) => {
+const disLikePlaylist = async ({ userId, playlistId }: LikePlaylistRequest) => {
   const { data } = await apiClient.post(`/api/playlist/${playlistId}/dislike`, {
     userId,
   });
   return data;
 };
 
-export const useLikePlaylist = () => {
+export const useDisikePlaylist = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: likePlaylist,
+    mutationFn: disLikePlaylist,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ['likedPlaylists', variables.userId],
