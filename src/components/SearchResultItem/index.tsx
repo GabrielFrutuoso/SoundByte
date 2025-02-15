@@ -1,11 +1,12 @@
 import { Heart, Play } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { usePlaylistStore } from "@/store/playlistStore";
 import { SearchResultType } from "@/app/types/SearchResult.type";
-import { useLikePlaylist } from "@/hooks/requests/like/useLikePlaylist";
-import { useUnlikePlaylist } from "@/hooks/requests/like/useUnlikePlaylist";
 import { useUserStore } from "@/store/userStore";
+import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
+import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist";
+import { useGetLikedPlaylists } from "@/hooks/requests/likedPlaylist/useGetLikedPlaylists";
 
 export const SearchResultItem = ({
   result,
@@ -17,9 +18,22 @@ export const SearchResultItem = ({
   const { singleSongId, playlistId, setPlaylistId, setSingleSongId, setIndex } =
     usePlaylistStore();
   const { mutate: likePlaylist } = useLikePlaylist();
-  const { mutate: unlikePlaylist } = useUnlikePlaylist();
+  const { mutate: disLikePlaylist } = useDisikePlaylist();
   const { user } = useUserStore();
 
+  const [isLiked, setIsLiked] = useState(false);
+  const { data: likedPlaylists } = useGetLikedPlaylists(
+    user?.id || ""
+  );
+  useEffect(() => {
+    const liked = likedPlaylists?.find(
+      (likedPlaylist) => likedPlaylist.playlist.id === result.id
+    );
+    setIsLiked(!!liked);
+  }, [likedPlaylists, result.id]);
+ console.log("liked", likedPlaylists?.find(
+  (likedPlaylist) => likedPlaylist.playlist.id === result.id
+))
   const handleSongSelect = (id: string | number) => {
     if (type === "song") {
       setPlaylistId("");
@@ -32,19 +46,22 @@ export const SearchResultItem = ({
     }
   };
 
-  const handleLikeUnlikePlaylist = () => {
-    if(user?.likedPlaylists?.some((likedPlaylist) => likedPlaylist.playlist.id === result.id)){
-      unlikePlaylist({
+  const handleLikePlaylist = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user?.id || type !== "playlist") return;
+
+    if (isLiked) {
+      disLikePlaylist({
+        userId: user.id,
         playlistId: result.id,
-        userId: user.id
       });
     } else {
       likePlaylist({
+        userId: user.id,
         playlistId: result.id,
-        userId: user?.id || ''
       });
     }
-  }
+  };
 
   return (
     <div
@@ -63,12 +80,16 @@ export const SearchResultItem = ({
           >
             <Play />
           </button>
-          <button
-            className="flex justify-center items-center w-8 h-8 sm:w-10 sm:h-10 p-1 rounded-lg bg-transparent [&_svg]:size-12 text-secondary-foreground"
-            onClick={() => handleLikeUnlikePlaylist()}
-          >
-            <Heart />
-          </button>
+          {type === "playlist" && (
+            <button
+              className={`flex justify-center items-center w-8 h-8 sm:w-10 sm:h-10 p-1 rounded-lg bg-transparent [&_svg]:size-12 ${
+                isLiked ? "text-lime-500" : "text-secondary-foreground"
+              }`}
+              onClick={handleLikePlaylist}
+            >
+              <Heart fill={isLiked ? "currentColor" : "none"} />
+            </button>
+          )}
         </div>
         <Image
           className="object-cover aspect-square rounded-lg"

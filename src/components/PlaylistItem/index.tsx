@@ -14,8 +14,8 @@ import {
 import { usePlaylistStore } from "@/store/playlistStore";
 import { toast } from "@/hooks/use-toast";
 import { useUserStore } from "@/store/userStore";
-import { useUnlikePlaylist } from "@/hooks/requests/like/useUnlikePlaylist";
-import { useLikePlaylist } from "@/hooks/requests/like/useLikePlaylist";
+import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist";
+import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
 
 export interface PlaylistItemProps {
   id: string;
@@ -48,7 +48,7 @@ export const PlaylistItem = ({
   };
 
   const { mutate: likePlaylist } = useLikePlaylist();
-  const { mutate: unlikePlaylist } = useUnlikePlaylist();
+  const { mutate: disLikePlaylist } = useDisikePlaylist();
 
   const handleLike = async () => {
     const likedPlaylists = currentUser?.likedPlaylists;
@@ -57,7 +57,7 @@ export const PlaylistItem = ({
     ) {
       likePlaylist({ playlistId: id, userId: currentUser?.id || "" });
     } else {
-      unlikePlaylist({ playlistId: id, userId: currentUser?.id || "" });
+      disLikePlaylist({ playlistId: id, userId: currentUser?.id || "" });
     }
   };
 
