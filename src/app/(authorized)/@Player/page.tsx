@@ -11,9 +11,7 @@ import { useEffect } from "react";
 export default function Player() {
   const { playlistId, singleSongId, index, increaseIndex, decreaseIndex } =
     usePlaylistStore();
-  console.log(
-    `Fetching song with singleSongId: ${singleSongId}, playlistId: ${playlistId}, index: ${index}`
-  );
+
   const validIndex = index !== undefined ? index : 0;
   const { data } = useGetToListen(singleSongId, playlistId, validIndex);
 
@@ -49,6 +47,7 @@ export default function Player() {
         songName={data?.title || ""}
         artist={data?.artist || ""}
         cover={data?.bannerSrc || ""}
+        songId={data?.id || ""}
       />
       <SoundControls
         isPlaying={isPlaying && data !== undefined}

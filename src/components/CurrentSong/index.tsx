@@ -1,14 +1,28 @@
 import React from "react";
 import Image from "next/image";
 import { Heart, Music } from "lucide-react";
+import { useUserStore } from "@/store/userStore";
+import { useGetLikedSongs } from "@/hooks/requests/likedSong/useGetLikedSongs";
 
 interface CurrentSongProps {
   songName: string;
   artist: string;
   cover: string;
+  songId?: string;
 }
 
-export const CurrentSong = ({ artist, songName, cover }: CurrentSongProps) => {
+export const CurrentSong = ({
+  artist,
+  songName,
+  cover,
+  songId,
+}: CurrentSongProps) => {
+  const { user } = useUserStore();
+  const { data: likedSongs } = useGetLikedSongs(user?.id || "");
+  const isLikedSong = likedSongs?.some(
+    (likedSong) => likedSong.song.id === songId
+  );
+
   return (
     <div className="flex items-center gap-4">
       {songName ? (
@@ -26,7 +40,7 @@ export const CurrentSong = ({ artist, songName, cover }: CurrentSongProps) => {
             <p>{artist}</p>
           </div>
           <div>
-            <Heart className="cursor-pointer text-lime-500" />
+            {isLikedSong && <Heart className="cursor-pointer text-lime-500" />}
           </div>
         </>
       ) : (
@@ -38,7 +52,7 @@ export const CurrentSong = ({ artist, songName, cover }: CurrentSongProps) => {
             <h1 className="text-xl font-bold">sem música tocando</h1>
           </div>
           <div>
-            <Heart className="cursor-pointer text-lime-500" />
+            <Heart className="cursor-pointer text-secondary-foreground" />
           </div>
         </>
       )}
