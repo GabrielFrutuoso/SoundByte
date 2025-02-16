@@ -20,7 +20,7 @@ export const useLikeSongs = () => {
     mutationFn: likeSong,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["likedPlaylists", variables.userId],
+        queryKey: ["likedSongs"],
       });
     },
   });

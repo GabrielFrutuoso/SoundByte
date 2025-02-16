@@ -28,9 +28,7 @@ export const SearchResultItem = ({
   const [isLikedPlaylist, setIsLikedPlaylist] = useState(false);
   const [isLikedSong, setIsLikedSong] = useState(false);
   const { data: likedPlaylists } = useGetLikedPlaylists(user?.id || "");
-
   const { data: likedSongs } = useGetLikedSongs(user?.id || "");
-  console.log("likes songs", likedSongs);
 
   useEffect(() => {
     if (type === "playlist") {
@@ -92,9 +90,7 @@ export const SearchResultItem = ({
   };
 
   return (
-    <div
-      className="flex flex-col gap-2 w-full cursor-pointer group"
-    >
+    <div className="flex flex-col gap-2 w-full cursor-pointer group">
       <div className="relative w-full aspect-square">
         <div className="flex items-center justify-center bg-white/15 group-hover:visible invisible absolute w-full h-full rounded-lg z-10">
           <button
