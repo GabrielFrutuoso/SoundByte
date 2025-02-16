@@ -7,6 +7,9 @@ import { useUserStore } from "@/store/userStore";
 import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
 import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist";
 import { useGetLikedPlaylists } from "@/hooks/requests/likedPlaylist/useGetLikedPlaylists";
+import { useLikeSongs } from "@/hooks/requests/song/useLikeSong";
+import { useDisikeSongs } from "@/hooks/requests/song/useDislikeSong";
+import { useGetLikedSongs } from "@/hooks/requests/likedSong/useGetLikedSongs";
 
 export const SearchResultItem = ({
   result,
@@ -19,21 +22,34 @@ export const SearchResultItem = ({
     usePlaylistStore();
   const { mutate: likePlaylist } = useLikePlaylist();
   const { mutate: disLikePlaylist } = useDisikePlaylist();
+  const { mutate: likeSong } = useLikeSongs();
+  const { mutate: disLikeSong } = useDisikeSongs();
   const { user } = useUserStore();
 
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLikedPlaylist, setIsLikedPlaylist] = useState(false);
+  const [isLikedSong, setIsLikedSong] = useState(false);
   const { data: likedPlaylists } = useGetLikedPlaylists(
     user?.id || ""
   );
+
+  const { data: likedSongs } = useGetLikedSongs(
+    user?.id || ""
+  );
+
   useEffect(() => {
-    const liked = likedPlaylists?.find(
-      (likedPlaylist) => likedPlaylist.playlist.id === result.id
-    );
-    setIsLiked(!!liked);
-  }, [likedPlaylists, result.id]);
- console.log("liked", likedPlaylists?.find(
-  (likedPlaylist) => likedPlaylist.playlist.id === result.id
-))
+    if (type === "playlist") {
+      const liked = likedPlaylists?.find(
+        (likedPlaylist) => likedPlaylist.playlist.id === result.id
+      );
+      setIsLikedPlaylist(!!liked);
+    } else if (type === "song") {
+      const liked = likedSongs?.find(
+        (likedSong) => likedSong.id === result.id
+      );
+      setIsLikedSong(!!liked);
+    }
+  }, [likedPlaylists, likedSongs, result.id, type]);
+
   const handleSongSelect = (id: string | number) => {
     if (type === "song") {
       setPlaylistId("");
@@ -46,20 +62,34 @@ export const SearchResultItem = ({
     }
   };
 
-  const handleLikePlaylist = (e: React.MouseEvent) => {
+  const handleLike = (e: React.MouseEvent, type: string) => {
     e.stopPropagation();
-    if (!user?.id || type !== "playlist") return;
+    if (!user?.id) return;
 
-    if (isLiked) {
-      disLikePlaylist({
-        userId: user.id,
-        playlistId: result.id,
-      });
-    } else {
-      likePlaylist({
-        userId: user.id,
-        playlistId: result.id,
-      });
+    if (type === "playlist") {
+      if (isLikedPlaylist) {
+        disLikePlaylist({
+          userId: user.id,
+          playlistId: result.id,
+        });
+      } else {
+        likePlaylist({
+          userId: user.id,
+          playlistId: result.id,
+        });
+      }
+    } else if (type === "song") {
+      if (isLikedSong) {
+        disLikeSong({
+          songId: result.id,
+          userId: user.id,
+        });
+      } else {
+        likeSong({
+          songId: result.id,
+          userId: user.id,
+        });
+      }
     }
   };
 
@@ -80,16 +110,14 @@ export const SearchResultItem = ({
           >
             <Play />
           </button>
-          {type === "playlist" && (
-            <button
-              className={`flex justify-center items-center w-8 h-8 sm:w-10 sm:h-10 p-1 rounded-lg bg-transparent [&_svg]:size-12 ${
-                isLiked ? "text-lime-500" : "text-secondary-foreground"
+          <button
+            className={`flex justify-center items-center w-8 h-8 sm:w-10 sm:h-10 p-1 rounded-lg bg-transparent [&_svg]:size-12 ${
+                isLikedPlaylist || isLikedSong ? "text-lime-500" : "text-secondary-foreground"
               }`}
-              onClick={handleLikePlaylist}
-            >
-              <Heart fill={isLiked ? "currentColor" : "none"} />
-            </button>
-          )}
+            onClick={(e) => handleLike(e, type)}
+          >
+            <Heart fill={isLikedPlaylist || isLikedSong ? "currentColor" : "none"} />
+          </button>
         </div>
         <Image
           className="object-cover aspect-square rounded-lg"

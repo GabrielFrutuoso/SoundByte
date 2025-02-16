@@ -11,7 +11,7 @@ const fetchLikedSongs = async (
 
 export const useGetLikedSongs = (userId: string) => {
   return useQuery({
-    queryKey: ["likedSongs", userId],
+    queryKey: ["likedSongs"],
     queryFn: () => fetchLikedSongs(userId),
   });
 };

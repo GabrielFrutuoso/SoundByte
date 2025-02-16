@@ -19,7 +19,6 @@ export const SongGroup = ({
 }: SongGroupProps) => {
   const {user} = useUserStore()
   const { data, isLoading } = useGetLikedSongs(user?.id || '');
-console.log("likedsongs: ", data[0].song);
 
   return (
     <div className="flex flex-col gap-2 mt-12">
