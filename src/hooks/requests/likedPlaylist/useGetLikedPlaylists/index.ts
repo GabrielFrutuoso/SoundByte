@@ -13,7 +13,7 @@ interface PlaylistResponse {
 }
 
 const fetchLikedPlaylists = async (userId: string): Promise<PlaylistResponse[]> => {
-  const { data } = await apiClient.get<PlaylistResponse[]>(`/api/${userId}/likedPlaylists`);
+  const { data } = await apiClient.get<PlaylistResponse[]>(`/api/user/${userId}/likedPlaylists`);
   return data;
 };
 

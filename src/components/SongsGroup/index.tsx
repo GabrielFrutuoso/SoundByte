@@ -2,8 +2,9 @@ import Link from "next/link";
 import React from "react";
 import { SongItem } from "../SongItem";
 import { SongItemProps } from "@/app/types/SongProps.type";
-import { useGetSongs } from "@/hooks/requests/song/useGetSongs.ts";
 import { SearchResultSkeleton } from "../SearchResultItem/Skeleton";
+import { useGetLikedSongs } from "@/hooks/requests/likedSong/useGetLikedSongs";
+import { useUserStore } from "@/store/userStore";
 
 interface SongGroupProps {
   title: string;
@@ -16,7 +17,9 @@ export const SongGroup = ({
   description,
   redirectTo,
 }: SongGroupProps) => {
-  const { data, isLoading } = useGetSongs("", "", 6);
+  const {user} = useUserStore()
+  const { data, isLoading } = useGetLikedSongs(user?.id || '');
+console.log("likedsongs: ", data[0].song);
 
   return (
     <div className="flex flex-col gap-2 mt-12">
@@ -31,8 +34,8 @@ export const SongGroup = ({
         </Link>
       </div>
       <ul className="grid grid-cols-6 gap-1">
-        {data?.data?.map((song: SongItemProps) => (
-          <SongItem key={song?.id} {...song} />
+        {data?.map(({ song }: { song: SongItemProps }) => (
+          <SongItem key={song.id} {...song} />
         ))}
         {isLoading && (
           <>
