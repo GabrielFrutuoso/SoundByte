@@ -18,8 +18,7 @@ export const SearchResultItem = ({
   result: SearchResultType;
   type: string;
 }) => {
-  const { singleSongId, playlistId, setPlaylistId, setSingleSongId, setIndex } =
-    usePlaylistStore();
+  const { setPlaylistId, setSingleSongId, setIndex } = usePlaylistStore();
   const { mutate: likePlaylist } = useLikePlaylist();
   const { mutate: disLikePlaylist } = useDisikePlaylist();
   const { mutate: likeSong } = useLikeSongs();
@@ -28,13 +27,10 @@ export const SearchResultItem = ({
 
   const [isLikedPlaylist, setIsLikedPlaylist] = useState(false);
   const [isLikedSong, setIsLikedSong] = useState(false);
-  const { data: likedPlaylists } = useGetLikedPlaylists(
-    user?.id || ""
-  );
+  const { data: likedPlaylists } = useGetLikedPlaylists(user?.id || "");
 
-  const { data: likedSongs } = useGetLikedSongs(
-    user?.id || ""
-  );
+  const { data: likedSongs } = useGetLikedSongs(user?.id || "");
+  console.log("likes songs", likedSongs);
 
   useEffect(() => {
     if (type === "playlist") {
@@ -42,11 +38,13 @@ export const SearchResultItem = ({
         (likedPlaylist) => likedPlaylist.playlist.id === result.id
       );
       setIsLikedPlaylist(!!liked);
+      console.log("Is Liked Playlist:", !!liked);
     } else if (type === "song") {
       const liked = likedSongs?.find(
-        (likedSong) => likedSong.id === result.id
+        (likedSong) => likedSong.song.id === result.id
       );
       setIsLikedSong(!!liked);
+      console.log("Is Liked Song:", !!liked);
     }
   }, [likedPlaylists, likedSongs, result.id, type]);
 
@@ -95,12 +93,7 @@ export const SearchResultItem = ({
 
   return (
     <div
-      className={`flex flex-col gap-2 w-full cursor-pointer group ${
-        (singleSongId === result.id && type === "song") ||
-        (playlistId === result.id && type === "playlist")
-          ? "text-lime-500"
-          : ""
-      }`}
+      className="flex flex-col gap-2 w-full cursor-pointer group"
     >
       <div className="relative w-full aspect-square">
         <div className="flex items-center justify-center bg-white/15 group-hover:visible invisible absolute w-full h-full rounded-lg z-10">
@@ -111,12 +104,16 @@ export const SearchResultItem = ({
             <Play />
           </button>
           <button
-            className={`flex justify-center items-center w-8 h-8 sm:w-10 sm:h-10 p-1 rounded-lg bg-transparent [&_svg]:size-12 ${
-                isLikedPlaylist || isLikedSong ? "text-lime-500" : "text-secondary-foreground"
-              }`}
+            className={`flex justify-center items-center w-16 h-16 sm:w-10 sm:h-10 p-1 rounded-lg bg-transparent [&_svg]:size-20 ${
+              isLikedPlaylist || isLikedSong
+                ? "text-lime-500"
+                : "text-secondary-foreground"
+            }`}
             onClick={(e) => handleLike(e, type)}
           >
-            <Heart fill={isLikedPlaylist || isLikedSong ? "currentColor" : "none"} />
+            <Heart
+              fill={isLikedPlaylist || isLikedSong ? "currentColor" : "none"}
+            />
           </button>
         </div>
         <Image
