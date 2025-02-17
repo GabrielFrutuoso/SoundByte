@@ -24,6 +24,7 @@ export async function GET(
             id: true,
             title: true,
             bannerSrc: true,
+            artist: true,
             user: {
               select: {
                 username: true,
