@@ -16,6 +16,7 @@ import { toast } from "@/hooks/use-toast";
 import { useUserStore } from "@/store/userStore";
 import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist";
 import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 export interface PlaylistItemProps {
   id: string;
@@ -38,6 +39,8 @@ export const PlaylistItem = ({
 }: PlaylistItemProps & baseStyleProps) => {
   const { playlistId, setPlaylistId, setSingleSongId, setIndex } =
     usePlaylistStore();
+
+  const { play } = useAudioPlayer();
 
   const { user: currentUser } = useUserStore();
 
@@ -71,7 +74,10 @@ export const PlaylistItem = ({
           })}
         >
           <div
-            onClick={() => handlePlaylistSelect(id)}
+            onClick={() => {
+              handlePlaylistSelect(id)
+              play()
+            }}
             className="relative group"
           >
             <button className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg">

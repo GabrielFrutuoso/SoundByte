@@ -17,14 +17,14 @@ export default function Player() {
 
   const {
     isPlaying,
-    currentTime,
+    play,
+    pause,
+    setSong,
+    audio,
     duration,
+    currentTime,
     volume,
-    isLoading,
-    audioRef,
-    handlePlayPause,
-    handleSeek,
-    handleVolumeChange,
+    setVolume,
   } = useAudioPlayer();
 
   const onNext = () => {
@@ -35,10 +35,16 @@ export default function Player() {
   };
 
   useEffect(() => {
-    if (data?.message) {
-      audioRef?.current?.pause();
+    if (data?.songURL) {
+      setSong(data.songURL);
     }
-  }, [audioRef, data?.message, volume]);
+  }, [data?.songURL, setSong]);
+
+  useEffect(() => {
+    if (data?.message) {
+      pause();
+    }
+  }, [data?.message, pause]);
 
   return (
     <div className="h-24 border-t border-zinc-800 flex items-center justify-around">
@@ -51,17 +57,19 @@ export default function Player() {
       />
       <SoundControls
         isPlaying={isPlaying && data !== undefined}
-        onPlayPause={handlePlayPause}
+        onPlayPause={() => (isPlaying ? pause() : play())}
         currentTime={currentTime}
         duration={duration}
-        onSeek={handleSeek}
-        isLoading={isLoading}
+        onSeek={(time) => {
+          audio.currentTime = time;
+        }}
+        isLoading={false}
         onNext={onNext}
         onPrevious={onPrevious}
         disabled={!!data?.message}
       />
-      <VolumeControl volume={volume} onVolumeChange={handleVolumeChange} />
-      <audio ref={audioRef} src={data?.songURL || undefined} />
+      <VolumeControl volume={volume} onVolumeChange={setVolume} />
+      <audio src={data?.songURL || undefined} />
     </div>
   );
 }
