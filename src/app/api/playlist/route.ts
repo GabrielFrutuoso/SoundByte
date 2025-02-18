@@ -17,6 +17,11 @@ export async function GET() {
       where: {
         isPrivate: false,
       },
+      orderBy: {
+        likedBy: {
+          _count: 'desc'
+        }
+      }
     });
 
     return NextResponse.json(playlists, { status: 200 });

@@ -63,9 +63,16 @@ export async function GET(request: NextRequest) {
           equals: false,
         },
       },
-      orderBy: {
-        updatedAt: "desc",
-      },
+      orderBy: [
+        {
+          likedBy: {
+            _count: "desc",
+          },
+        },
+        {
+          updatedAt: "desc",
+        },
+      ],
       take: take ? parseInt(take) : undefined,
     });
 
