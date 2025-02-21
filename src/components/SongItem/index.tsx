@@ -4,21 +4,19 @@ import Image from "next/image";
 import React from "react";
 import { usePlaylistStore } from "@/store/playlistStore";
 
-export const SongItem = (song: SongItemProps) => {
-  const { singleSongId, setPlaylistId, setSingleSongId, setIndex } =
-    usePlaylistStore();
+export const SongItem = ({ id, bannerSrc, title, artist }: SongItemProps) => {
+  const { uuid, setUuid, setIndex } = usePlaylistStore();
 
-  const handleSongSelect = (id: string | number) => {
-    setPlaylistId("");
-    setSingleSongId(String(id));
+  const handleSongSelect = () => {
+    setUuid(id);
     setIndex(0);
   };
 
   return (
     <div
-      onClick={() => handleSongSelect(song.id)}
+      onClick={handleSongSelect}
       className={`flex flex-col gap-2 w-60 cursor-pointer group ${
-        singleSongId === song.id ? "text-lime-500" : ""
+        uuid === id ? "text-lime-500" : ""
       }`}
     >
       <div className="relative">
@@ -30,7 +28,7 @@ export const SongItem = (song: SongItemProps) => {
           draggable={false}
           width={500}
           height={500}
-          src={song?.bannerSrc}
+          src={bannerSrc}
           priority
           alt="Album cover"
         />
@@ -38,16 +36,16 @@ export const SongItem = (song: SongItemProps) => {
 
       <div>
         <p
-          title={song?.title}
+          title={title}
           className="text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap"
         >
-          {song?.title}
+          {title}
         </p>
         <p
-          title={song?.artist}
+          title={artist}
           className="text-sm font-thin opacity-75 text-ellipsis overflow-hidden whitespace-nowrap"
         >
-          {song?.artist}
+          {artist}
         </p>
       </div>
     </div>
