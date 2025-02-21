@@ -9,67 +9,62 @@ import { usePlaylistStore } from "@/store/playlistStore";
 import { useEffect } from "react";
 
 export default function Player() {
-  const { playlistId, singleSongId, index, increaseIndex, decreaseIndex } =
+  const { uuid, index, nextSong, previousSong, setMaxIndex } =
     usePlaylistStore();
-
-  const validIndex = index !== undefined ? index : 0;
-  const { data } = useGetToListen(singleSongId, playlistId, validIndex);
-
+  const { data } = useGetToListen(uuid);
   const {
     isPlaying,
     play,
     pause,
     setSong,
-    audio,
-    duration,
     currentTime,
+    duration,
     volume,
     setVolume,
+    setCurrentTime,
   } = useAudioPlayer();
 
-  const onNext = () => {
-    increaseIndex();
-  };
-  const onPrevious = () => {
-    decreaseIndex();
-  };
+  const currentSong = data?.songs?.[index];
 
   useEffect(() => {
-    if (data?.songURL) {
-      setSong(data.songURL);
+    if (data?.songs) {
+      setMaxIndex(data.songs.length);
+      if (!data.songs.length) {
+        pause();
+      }
     }
-  }, [data?.songURL, setSong]);
+  }, [data?.songs, setMaxIndex, pause]);
 
   useEffect(() => {
-    if (data?.message) {
+    if (currentSong?.songURL) {
+      setSong(currentSong.songURL);
+      if (isPlaying) play();
+    } else {
       pause();
     }
-  }, [data?.message, pause]);
+  }, [currentSong?.songURL, setSong, play, isPlaying, pause]);
 
   return (
     <div className="h-24 border-t border-zinc-800 flex items-center justify-around">
       <CurrentSong
-        key={data?.id}
-        songName={data?.title || ""}
-        artist={data?.artist || ""}
-        cover={data?.bannerSrc || ""}
-        songId={data?.id || ""}
+        key={currentSong?.id}
+        songName={currentSong?.title || ""}
+        artist={currentSong?.artist || ""}
+        cover={currentSong?.bannerSrc || ""}
+        songId={currentSong?.id || ""}
       />
       <SoundControls
-        isPlaying={isPlaying && data !== undefined}
+        isPlaying={isPlaying && currentSong !== undefined}
         onPlayPause={() => (isPlaying ? pause() : play())}
         currentTime={currentTime}
         duration={duration}
-        onSeek={(time) => {
-          audio.currentTime = time;
-        }}
+        onSeek={setCurrentTime}
         isLoading={false}
-        onNext={onNext}
-        onPrevious={onPrevious}
-        disabled={!!data?.message}
+        onNext={nextSong}
+        onPrevious={previousSong}
+        disabled={!currentSong?.songURL}
       />
       <VolumeControl volume={volume} onVolumeChange={setVolume} />
-      <audio src={data?.songURL || undefined} />
     </div>
   );
 }
