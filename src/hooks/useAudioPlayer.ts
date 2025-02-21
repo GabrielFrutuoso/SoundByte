@@ -4,16 +4,15 @@ import { persist } from "zustand/middleware";
 interface AudioStore {
   audio: HTMLAudioElement;
   isPlaying: boolean;
-  currentSong: string | null;
-  duration: number;
   currentTime: number;
+  duration: number;
   volume: number;
   setSong: (url: string) => void;
-  play: () => void;
+  play: () => Promise<void>;
   pause: () => void;
   togglePlay: () => void;
   setVolume: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  setVolumeValue: (value: number) => void;
+  setCurrentTime: (time: number) => void;
 }
 
 export const useAudioPlayer = create<AudioStore>()(
@@ -21,15 +20,14 @@ export const useAudioPlayer = create<AudioStore>()(
     (set, get) => ({
       audio: new Audio(),
       isPlaying: false,
-      currentSong: null,
-      duration: 0,
       currentTime: 0,
+      duration: 0,
       volume: 1,
+
       setSong: (url) => {
         const { audio, volume } = get();
         audio.src = url;
         audio.volume = volume;
-        set({ currentSong: url });
 
         audio.addEventListener("loadedmetadata", () => {
           set({ duration: audio.duration });
@@ -38,40 +36,43 @@ export const useAudioPlayer = create<AudioStore>()(
         audio.addEventListener("timeupdate", () => {
           set({ currentTime: audio.currentTime });
         });
+
+        audio.addEventListener("ended", () => {
+          set({ isPlaying: false, currentTime: 0 });
+        });
       },
-      play: () => {
+
+      play: async () => {
         const { audio } = get();
-        audio.play();
+        await audio.play();
         set({ isPlaying: true });
       },
+
       pause: () => {
         const { audio } = get();
         audio.pause();
         set({ isPlaying: false });
       },
+
       togglePlay: () => {
         const { isPlaying, play, pause } = get();
-        if (isPlaying) {
-          pause();
-        } else {
-          play();
-        }
+        if (isPlaying) pause();
+        else play();
       },
+
       setVolume: (event) => {
         const { audio } = get();
         const newVolume = parseFloat(event.target.value);
-        if (!isNaN(newVolume) && isFinite(newVolume)) {
+        if (isFinite(newVolume)) {
           audio.volume = newVolume;
           set({ volume: newVolume });
         }
       },
-      setVolumeValue: (value) => {
+
+      setCurrentTime: (time) => {
         const { audio } = get();
-        if (!isNaN(value) && isFinite(value)) {
-          const newVolume = Math.min(Math.max(value, 0), 1);
-          audio.volume = newVolume;
-          set({ volume: newVolume });
-        }
+        audio.currentTime = time;
+        set({ currentTime: time });
       },
     }),
     {
