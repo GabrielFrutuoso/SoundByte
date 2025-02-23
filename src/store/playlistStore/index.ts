@@ -1,29 +1,39 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-type PlaylistStore = {
-  playlistId: string | undefined;
-  setPlaylistId: (playlistId: string) => void;
-  singleSongId: string | undefined;
-  setSingleSongId: (singleSongId: string | undefined) => void;
-  index: number | undefined;
-  setIndex: (index: number | undefined) => void;
-  increaseIndex: () => void;
-  decreaseIndex: () => void;
-};
+interface PlaylistStore {
+  uuid: string | undefined;
+  index: number;
+  maxIndex: number;
+  setUuid: (uuid: string) => void;
+  setIndex: (index: number) => void;
+  setMaxIndex: (max: number) => void;
+  nextSong: () => void;
+  previousSong: () => void;
+}
 
 export const usePlaylistStore = create<PlaylistStore>()(
   persist(
     (set) => ({
-      playlistId: undefined,
-      singleSongId: undefined,
-      index: 0, 
-      setPlaylistId: (playlistId) => set({ playlistId }),
-      setSingleSongId: (singleSongId) => set({ singleSongId }),
+      uuid: undefined,
+      index: 0,
+      maxIndex: 0,
+
+      setUuid: (uuid) => set({ uuid, index: 0 }),
       setIndex: (index) => set({ index }),
-      increaseIndex: () => set((state) => ({ index: (state?.index ?? 0) + 1 })),
-      decreaseIndex: () => set((state) => ({ index: (state?.index ?? 0) - 1 })),
+      setMaxIndex: (max) => set({ maxIndex: max }),
+
+      nextSong: () =>
+        set((state) => ({
+          index:
+            state.index < state.maxIndex - 1 ? state.index + 1 : state.index,
+        })),
+
+      previousSong: () =>
+        set((state) => ({
+          index: state.index > 0 ? state.index - 1 : state.index,
+        })),
     }),
-    { name: 'playlist-storage' }
+    { name: "playlist-storage" }
   )
 );

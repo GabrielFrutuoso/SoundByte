@@ -16,6 +16,7 @@ import { toast } from "@/hooks/use-toast";
 import { useUserStore } from "@/store/userStore";
 import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist";
 import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 export interface PlaylistItemProps {
   id: string;
@@ -36,15 +37,13 @@ export const PlaylistItem = ({
   isInMenu,
   isCollapsed,
 }: PlaylistItemProps & baseStyleProps) => {
-  const { playlistId, setPlaylistId, setSingleSongId, setIndex } =
-    usePlaylistStore();
+  const { setUuid, uuid,  } = usePlaylistStore();
+  const { play } = useAudioPlayer();
 
   const { user: currentUser } = useUserStore();
 
-  const handlePlaylistSelect = (id: string) => {
-    setPlaylistId(id);
-    setSingleSongId(undefined);
-    setIndex(0);
+  const handlePlaylistSelect = () => {
+    setUuid(id);
   };
 
   const { mutate: likePlaylist } = useLikePlaylist();
@@ -61,24 +60,29 @@ export const PlaylistItem = ({
     }
   };
 
+  const isCurrentPlaylist = uuid === id;
+
   return (
     <ContextMenu>
       <ContextMenuTrigger>
         <div
           className={baseStyle({
             variant,
-            className: `${playlistId === id ? "text-lime-500" : ""}`,
+            className: isCurrentPlaylist ? "text-lime-500" : "",
           })}
         >
           <div
-            onClick={() => handlePlaylistSelect(id)}
+            onClick={() => {
+              handlePlaylistSelect();
+              play();
+            }}
             className="relative group"
           >
             <button className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg">
               <Play />
             </button>
             <Image
-              className={` ${
+              className={`${
                 isInMenu && "w-20"
               } rounded-lg aspect-square object-cover`}
               draggable={false}
@@ -108,7 +112,7 @@ export const PlaylistItem = ({
             const url = `${window.location.origin}/playlist?id=${id}`;
             navigator.clipboard.writeText(url);
             toast({
-              title: "Copiado para a área de transferência",
+              title: "Copiado para a área de transferência",
               description: "Use Ctrl + V para colar o link",
             });
           }}

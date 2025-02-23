@@ -1,140 +1,83 @@
-import { useState, useRef, useEffect } from "react";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-export function useAudioPlayer() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.5);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const audioRef = useRef<HTMLAudioElement>(null);
-
-  useEffect(() => {
-    const audioElement = audioRef.current;
-    if (!audioElement) return;
-
-    audioElement.volume = volume;
-
-    const handleLoadStart = () => {
-      setIsLoading(true);
-      setTimeout(() => {
-        if (audioElement.readyState === 0) {
-          setIsLoading(false);
-          console.error("Audio failed to load within timeout");
-        }
-      }, 5000);
-    };
-
-    const handleCanPlay = () => {
-      setIsLoading(false);
-      setDuration(audioElement.duration);
-    };
-
-    const handleLoadedData = () => {
-      setIsLoading(false);
-      setDuration(audioElement.duration);
-    };
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(audioElement.currentTime);
-    };
-
-    const handleEnded = () => {
-      setIsPlaying(false);
-      setCurrentTime(0);
-    };
-
-    const handleError = (e: ErrorEvent) => {
-      console.error("Audio Error:", e);
-      setIsLoading(false);
-    };
-
-    audioElement.addEventListener("loadstart", handleLoadStart);
-    audioElement.addEventListener("canplay", handleCanPlay);
-    audioElement.addEventListener("loadeddata", handleLoadedData);
-    audioElement.addEventListener("timeupdate", handleTimeUpdate);
-    audioElement.addEventListener("ended", handleEnded);
-    audioElement.addEventListener("error", handleError);
-
-    if (audioElement.readyState >= 2) {
-      setIsLoading(false);
-      setDuration(audioElement.duration);
-    }
-
-    return () => {
-      audioElement.removeEventListener("loadstart", handleLoadStart);
-      audioElement.removeEventListener("canplay", handleCanPlay);
-      audioElement.removeEventListener("loadeddata", handleLoadedData);
-      audioElement.removeEventListener("timeupdate", handleTimeUpdate);
-      audioElement.removeEventListener("ended", handleEnded);
-      audioElement.removeEventListener("error", handleError);
-    };
-  }, [volume]);
-
-  const handlePlayPause = () => {
-    if (!audioRef.current || isLoading) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play().catch((error) => {
-        console.error("Play Error:", error);
-        setIsLoading(false);
-      });
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleSeek = (value: number) => {
-    if (!audioRef.current || isLoading) return;
-
-    audioRef.current.currentTime = value;
-    setCurrentTime(value);
-  };
-
-  const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(event.target.value);
-    setVolume(newVolume);
-
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-    }
-  };
-
-  const handleSongChange = (src?: string) => {
-    if (!audioRef.current || !src) return;
-    
-    setIsLoading(true);
-    setIsPlaying(false);
-    setCurrentTime(0);
-    
-    audioRef.current.src = src;
-    audioRef.current.load();
-    
-    // Auto-play when ready
-    const playWhenReady = () => {
-      audioRef.current?.play()
-        .then(() => setIsPlaying(true))
-        .catch(error => {
-          console.error('Auto-play Error:', error);
-          setIsPlaying(false);
-        });
-      audioRef.current?.removeEventListener('canplay', playWhenReady);
-    };
-    
-    audioRef.current.addEventListener('canplay', playWhenReady);
-  };
-
-  return {
-    isPlaying,
-    currentTime,
-    duration,
-    volume,
-    isLoading,
-    audioRef,
-    handlePlayPause,
-    handleSeek,
-    handleVolumeChange,
-    handleSongChange,
-  };
+interface AudioStore {
+  audio: HTMLAudioElement;
+  isPlaying: boolean;
+  currentTime: number;
+  duration: number;
+  volume: number;
+  setSong: (url: string) => void;
+  play: () => Promise<void>;
+  pause: () => void;
+  togglePlay: () => void;
+  setVolume: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  setCurrentTime: (time: number) => void;
 }
+
+export const useAudioPlayer = create<AudioStore>()(
+  persist(
+    (set, get) => ({
+      audio: new Audio(),
+      isPlaying: false,
+      currentTime: 0,
+      duration: 0,
+      volume: 1,
+
+      setSong: (url) => {
+        const { audio, volume } = get();
+        audio.src = url;
+        audio.volume = volume;
+
+        audio.addEventListener("loadedmetadata", () => {
+          set({ duration: audio.duration });
+        });
+
+        audio.addEventListener("timeupdate", () => {
+          set({ currentTime: audio.currentTime });
+        });
+
+        audio.addEventListener("ended", () => {
+          set({ isPlaying: false, currentTime: 0 });
+        });
+      },
+
+      play: async () => {
+        const { audio } = get();
+        await audio.play();
+        set({ isPlaying: true });
+      },
+
+      pause: () => {
+        const { audio } = get();
+        audio.pause();
+        set({ isPlaying: false });
+      },
+
+      togglePlay: () => {
+        const { isPlaying, play, pause } = get();
+        if (isPlaying) pause();
+        else play();
+      },
+
+      setVolume: (event) => {
+        const { audio } = get();
+        const newVolume = parseFloat(event.target.value);
+        if (isFinite(newVolume)) {
+          audio.volume = newVolume;
+          set({ volume: newVolume });
+        }
+      },
+
+      setCurrentTime: (time) => {
+        const { audio } = get();
+        audio.currentTime = time;
+        set({ currentTime: time });
+      },
+    }),
+    {
+      name: "audio-storage",
+      partialize: (state) => ({ volume: state.volume }),
+    }
+  )
+);

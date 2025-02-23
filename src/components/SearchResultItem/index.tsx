@@ -11,6 +11,12 @@ import { useLikeSongs } from "@/hooks/requests/song/useLikeSong";
 import { useDisikeSongs } from "@/hooks/requests/song/useDislikeSong";
 import { useGetLikedSongs } from "@/hooks/requests/likedSong/useGetLikedSongs";
 
+interface LikedSong {
+  song: {
+    id: string;
+  };
+}
+
 export const SearchResultItem = ({
   result,
   type,
@@ -18,13 +24,12 @@ export const SearchResultItem = ({
   result: SearchResultType;
   type: string;
 }) => {
-  const { setPlaylistId, setSingleSongId, setIndex } = usePlaylistStore();
+  const { setUuid } = usePlaylistStore();
   const { mutate: likePlaylist } = useLikePlaylist();
   const { mutate: disLikePlaylist } = useDisikePlaylist();
   const { mutate: likeSong } = useLikeSongs();
   const { mutate: disLikeSong } = useDisikeSongs();
   const { user } = useUserStore();
-
   const [isLikedPlaylist, setIsLikedPlaylist] = useState(false);
   const [isLikedSong, setIsLikedSong] = useState(false);
   const { data: likedPlaylists } = useGetLikedPlaylists(user?.id || "");
@@ -36,26 +41,16 @@ export const SearchResultItem = ({
         (likedPlaylist) => likedPlaylist.playlist.id === result.id
       );
       setIsLikedPlaylist(!!liked);
-      console.log("Is Liked Playlist:", !!liked);
     } else if (type === "song") {
       const liked = likedSongs?.find(
-        (likedSong) => likedSong.song.id === result.id
+        (likedSong: LikedSong) => likedSong.song.id === result.id
       );
       setIsLikedSong(!!liked);
-      console.log("Is Liked Song:", !!liked);
     }
   }, [likedPlaylists, likedSongs, result.id, type]);
 
   const handleSongSelect = (id: string | number) => {
-    if (type === "song") {
-      setPlaylistId("");
-      setSingleSongId(String(id));
-      setIndex(undefined);
-    } else {
-      setPlaylistId(String(id));
-      setSingleSongId(undefined);
-      setIndex(0);
-    }
+    setUuid(String(id));
   };
 
   const handleLike = (e: React.MouseEvent, type: string) => {
