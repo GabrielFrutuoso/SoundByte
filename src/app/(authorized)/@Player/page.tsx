@@ -22,6 +22,8 @@ export default function Player() {
     volume,
     setVolume,
     setCurrentTime,
+    repeat,
+    toggleRepeat,
   } = useAudioPlayer();
 
   const currentSong = data?.songs?.[index];
@@ -63,6 +65,8 @@ export default function Player() {
         onNext={nextSong}
         onPrevious={previousSong}
         disabled={!currentSong?.songURL}
+        repeat={repeat}
+        onRepeatToggle={toggleRepeat}
       />
       <VolumeControl volume={volume} onVolumeChange={setVolume} />
     </div>

@@ -8,10 +8,12 @@ interface AudioStore {
   duration: number;
   volume: number;
   currentUrl: string | null;
+  repeat: boolean; 
   setSong: (url: string) => void;
   play: () => Promise<void>;
   pause: () => void;
   togglePlay: () => Promise<void>;
+  toggleRepeat: () => void;
   setVolume: (event: React.ChangeEvent<HTMLInputElement>) => void;
   setCurrentTime: (time: number) => void;
 }
@@ -25,6 +27,7 @@ export const useAudioPlayer = create<AudioStore>()(
       duration: 0,
       volume: 1,
       currentUrl: null,
+      repeat: false, 
 
       setSong: (url) => {
         const { audio, volume, currentUrl } = get();
@@ -43,7 +46,13 @@ export const useAudioPlayer = create<AudioStore>()(
         });
 
         audio.addEventListener("ended", () => {
-          set({ isPlaying: false });
+          const { repeat } = get();
+          if (repeat) {
+            audio.currentTime = 0;
+            audio.play(); 
+          } else {
+            set({ isPlaying: false });
+          }
         });
       },
 
@@ -70,6 +79,11 @@ export const useAudioPlayer = create<AudioStore>()(
         } else {
           await play();
         }
+      },
+
+      toggleRepeat: () => {
+        const { repeat } = get();
+        set({ repeat: !repeat });
       },
 
       setVolume: (event) => {

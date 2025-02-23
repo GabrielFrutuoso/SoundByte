@@ -1,17 +1,19 @@
 import React from "react";
 import { RangeInput } from "../ui/RangeInput";
-import { Play, Pause, SkipBack, SkipForward, Loader2 } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Loader2, Repeat } from "lucide-react";
 
 interface SoundControlsProps {
   isPlaying: boolean;
   onPlayPause: () => void;
   currentTime: number;
   duration: number;
-  onSeek: (value: number) => void;
-  isLoading?: boolean;
-  onNext?: () => void;
-  onPrevious?: () => void;
-  disabled?: boolean;
+  onSeek: (time: number) => void;
+  isLoading: boolean;
+  onNext: () => void;
+  onPrevious: () => void;
+  disabled: boolean;
+  repeat: boolean;
+  onRepeatToggle: () => void;
 }
 
 export const SoundControls: React.FC<SoundControlsProps> = ({
@@ -24,6 +26,8 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
   onNext,
   onPrevious,
   disabled = false,
+  repeat,
+  onRepeatToggle,
 }) => {
   // Format time to MM:SS
   const formatTime = (timeInSeconds: number) => {
@@ -74,6 +78,14 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
           disabled={isLoading || disabled}
         >
           <SkipForward />
+        </button>
+        <button
+          onClick={onRepeatToggle}
+          title="repeat"
+          className={`p-1 rounded-md hover:bg-primary/25 disabled:opacity-50 ${repeat ? "text-lime-500" : ""}`}
+          disabled={isLoading || disabled}
+        >
+          <Repeat />
         </button>
       </div>
       <div className="w-full flex items-center justify-between space-x-4">
