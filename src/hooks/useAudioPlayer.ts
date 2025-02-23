@@ -7,10 +7,11 @@ interface AudioStore {
   currentTime: number;
   duration: number;
   volume: number;
+  currentUrl: string | null;
   setSong: (url: string) => void;
   play: () => Promise<void>;
   pause: () => void;
-  togglePlay: () => void;
+  togglePlay: () => Promise<void>;
   setVolume: (event: React.ChangeEvent<HTMLInputElement>) => void;
   setCurrentTime: (time: number) => void;
 }
@@ -23,11 +24,15 @@ export const useAudioPlayer = create<AudioStore>()(
       currentTime: 0,
       duration: 0,
       volume: 1,
+      currentUrl: null,
 
       setSong: (url) => {
-        const { audio, volume } = get();
+        const { audio, volume, currentUrl } = get();
+        if (currentUrl === url) return;
+
         audio.src = url;
         audio.volume = volume;
+        set({ currentUrl: url });
 
         audio.addEventListener("loadedmetadata", () => {
           set({ duration: audio.duration });
@@ -38,14 +43,18 @@ export const useAudioPlayer = create<AudioStore>()(
         });
 
         audio.addEventListener("ended", () => {
-          set({ isPlaying: false, currentTime: 0 });
+          set({ isPlaying: false });
         });
       },
 
       play: async () => {
         const { audio } = get();
-        await audio.play();
-        set({ isPlaying: true });
+        try {
+          await audio.play();
+          set({ isPlaying: true });
+        } catch (error) {
+          console.error("Play error:", error);
+        }
       },
 
       pause: () => {
@@ -54,10 +63,13 @@ export const useAudioPlayer = create<AudioStore>()(
         set({ isPlaying: false });
       },
 
-      togglePlay: () => {
+      togglePlay: async () => {
         const { isPlaying, play, pause } = get();
-        if (isPlaying) pause();
-        else play();
+        if (isPlaying) {
+          pause();
+        } else {
+          await play();
+        }
       },
 
       setVolume: (event) => {
