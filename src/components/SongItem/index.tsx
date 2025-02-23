@@ -1,11 +1,13 @@
 import { SongItemProps } from "@/app/types/SongProps.type";
-import { Play } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 import { usePlaylistStore } from "@/store/playlistStore";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 export const SongItem = ({ id, bannerSrc, title, artist }: SongItemProps) => {
   const { uuid, setUuid, setIndex } = usePlaylistStore();
+  const { play, pause, isPlaying } = useAudioPlayer();
 
   const handleSongSelect = () => {
     setUuid(id);
@@ -20,8 +22,18 @@ export const SongItem = ({ id, bannerSrc, title, artist }: SongItemProps) => {
       }`}
     >
       <div className="relative">
-        <button className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg">
-          <Play size={40} />
+        <button
+          onClick={() => {
+            if (isPlaying && uuid === id) {
+              pause();
+            } else {
+              handleSongSelect();
+              play();
+            }
+          }}
+          className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg"
+        >
+          {isPlaying && uuid === id ? <Pause size={40} /> : <Play size={40} />}
         </button>
         <Image
           className="w-full object-cover aspect-square rounded-lg"

@@ -1,4 +1,4 @@
-import { Heart, Play } from "lucide-react";
+import { Heart, Pause, Play } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { usePlaylistStore } from "@/store/playlistStore";
@@ -10,6 +10,7 @@ import { useGetLikedPlaylists } from "@/hooks/requests/likedPlaylist/useGetLiked
 import { useLikeSongs } from "@/hooks/requests/song/useLikeSong";
 import { useDisikeSongs } from "@/hooks/requests/song/useDislikeSong";
 import { useGetLikedSongs } from "@/hooks/requests/likedSong/useGetLikedSongs";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 interface LikedSong {
   song: {
@@ -24,7 +25,8 @@ export const SearchResultItem = ({
   result: SearchResultType;
   type: string;
 }) => {
-  const { setUuid } = usePlaylistStore();
+  const { setUuid, uuid } = usePlaylistStore();
+  const { play, pause, isPlaying } = useAudioPlayer();
   const { mutate: likePlaylist } = useLikePlaylist();
   const { mutate: disLikePlaylist } = useDisikePlaylist();
   const { mutate: likeSong } = useLikeSongs();
@@ -89,10 +91,17 @@ export const SearchResultItem = ({
       <div className="relative w-full aspect-square">
         <div className="flex items-center justify-center bg-white/15 group-hover:visible invisible absolute w-full h-full rounded-lg z-10">
           <button
-            className="flex justify-center items-center w-8 h-8 sm:w-10 sm:h-10 p-1 rounded-lg absolute right-2 bottom-2 bg-transparent [&_svg]:size-10 text-secondary-foreground"
-            onClick={() => handleSongSelect(result.id)}
+            className={"flex justify-center items-center w-8 h-8 sm:w-10 sm:h-10 p-1 rounded-lg absolute right-2 bottom-2 bg-transparent [&_svg]:size-10 text-secondary-foreground"}
+            onClick={() => {
+              if (isPlaying && uuid === result.id) {
+                pause();
+              } else {
+                handleSongSelect(result.id);
+                play();
+              }
+            }}
           >
-            <Play />
+            {isPlaying && uuid === result.id ? <Pause /> : <Play />}
           </button>
           <button
             className={`flex justify-center items-center w-16 h-16 sm:w-10 sm:h-10 p-1 rounded-lg bg-transparent [&_svg]:size-20 ${
@@ -118,7 +127,7 @@ export const SearchResultItem = ({
         />
       </div>
 
-      <div className="w-full">
+      <div className={`w-full ${uuid === result.id ? "text-lime-500" : ""}`}>
         <p
           title={result?.title}
           className="text-base sm:text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap"

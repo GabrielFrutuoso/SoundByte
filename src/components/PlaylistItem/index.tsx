@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { baseStyle, baseStyleProps } from "./style";
-import { Play } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 import Link from "next/link";
 import {
   ContextMenu,
@@ -37,8 +37,8 @@ export const PlaylistItem = ({
   isInMenu,
   isCollapsed,
 }: PlaylistItemProps & baseStyleProps) => {
-  const { setUuid, uuid,  } = usePlaylistStore();
-  const { play } = useAudioPlayer();
+  const { setUuid, uuid } = usePlaylistStore();
+  const { play, pause, isPlaying } = useAudioPlayer();
 
   const { user: currentUser } = useUserStore();
 
@@ -71,15 +71,19 @@ export const PlaylistItem = ({
             className: isCurrentPlaylist ? "text-lime-500" : "",
           })}
         >
-          <div
-            onClick={() => {
-              handlePlaylistSelect();
-              play();
-            }}
-            className="relative group"
-          >
-            <button className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg">
-              <Play />
+          <div className="relative group">
+            <button
+              onClick={() => {
+                if (isPlaying && isCurrentPlaylist) {
+                  pause();
+                } else {
+                  handlePlaylistSelect();
+                  play();
+                }
+              }}
+              className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg"
+            >
+              {isPlaying && isCurrentPlaylist ? <Pause /> : <Play />}
             </button>
             <Image
               className={`${
