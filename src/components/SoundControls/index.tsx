@@ -1,107 +1,84 @@
 import React from "react";
-import { RangeInput } from "../ui/RangeInput";
-import { Play, Pause, SkipBack, SkipForward, Loader2, Repeat } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle } from "lucide-react";
+import { Button } from "../ui/button";
+
+export enum RepeatMode {
+  NONE = "NONE",
+  SINGLE = "SINGLE",
+  PLAYLIST = "PLAYLIST",
+}
 
 interface SoundControlsProps {
   isPlaying: boolean;
+  repeatMode: RepeatMode;
+  shuffle: boolean;
   onPlayPause: () => void;
-  currentTime: number;
-  duration: number;
-  onSeek: (time: number) => void;
-  isLoading: boolean;
   onNext: () => void;
   onPrevious: () => void;
-  disabled: boolean;
-  repeat: boolean;
-  onRepeatToggle: () => void;
+  onRepeatClick: () => void;
+  onShuffleClick: () => void;
 }
 
 export const SoundControls: React.FC<SoundControlsProps> = ({
   isPlaying,
+  repeatMode,
+  shuffle,
   onPlayPause,
-  currentTime,
-  duration,
-  onSeek,
-  isLoading = false,
   onNext,
   onPrevious,
-  disabled = false,
-  repeat,
-  onRepeatToggle,
+  onRepeatClick,
+  onShuffleClick,
 }) => {
-  // Format time to MM:SS
-  const formatTime = (timeInSeconds: number) => {
-    if (!timeInSeconds || isNaN(timeInSeconds)) return "0:00";
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  };
-
-  // Calculate seek value as a percentage
-  const seekValue = duration > 0 ? (currentTime / duration) * 100 : 0;
-
-  const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    const seekTime = (value / 100) * duration;
-    onSeek(seekTime);
+  const getRepeatButton = () => {
+    switch (repeatMode) {
+      case RepeatMode.NONE:
+        return <Repeat />;
+      case RepeatMode.SINGLE:
+        return <Repeat className="text-lime-500" />;
+      case RepeatMode.PLAYLIST:
+        return <Repeat className="text-blue-500" />;
+    }
   };
 
   return (
-    <div className="flex flex-col items-center w-96 gap-2">
-      <div className="w-2/4 flex items-center justify-around">
-        <button
-          onClick={onPrevious}
-          title="previous"
-          className="p-1 rounded-md hover:bg-primary/25 disabled:opacity-50"
-          disabled={isLoading || disabled}
-        >
-          <SkipBack />
-        </button>
-        <button
-          title={isPlaying ? "pause" : "play"}
-          onClick={onPlayPause}
-          className="p-2 rounded-md hover:bg-primary/25 disabled:opacity-50"
-          disabled={isLoading || disabled}
-        >
-          {isLoading ? (
-            <Loader2 className="w-6 h-6 animate-spin" />
-          ) : isPlaying ? (
-            <Pause className="w-6 h-6" />
-          ) : (
-            <Play className="w-6 h-6" />
-          )}
-        </button>
-        <button
-          onClick={onNext}
-          title="next"
-          className="p-1 rounded-md hover:bg-primary/25 disabled:opacity-50"
-          disabled={isLoading || disabled}
-        >
-          <SkipForward />
-        </button>
-        <button
-          onClick={onRepeatToggle}
-          title="repeat"
-          className={`p-1 rounded-md hover:bg-primary/25 disabled:opacity-50 ${repeat ? "text-lime-500" : ""}`}
-          disabled={isLoading || disabled}
-        >
-          <Repeat />
-        </button>
-      </div>
-      <div className="w-full flex items-center justify-between space-x-4">
-        <span className="w-10 text-sm text-right">
-          {formatTime(currentTime)}
-        </span>
-        <RangeInput
-          className="w-full"
-          min={0}
-          max={100}
-          value={seekValue}
-          onChange={handleSeekChange}
-          disabled={isLoading || duration === 0 || disabled}
-        />
-        <span className="w-10 text-sm">{formatTime(duration)}</span>
-      </div>
+    <div className="flex items-center gap-4">
+      <Button
+        className="[&_svg]:size-4"
+        variant={"ghost"}
+        onClick={onRepeatClick}
+        title={`Repeat Mode: ${repeatMode}`}
+      >
+        {getRepeatButton()}
+      </Button>
+      <Button
+        className="[&_svg]:size-5"
+        variant={"ghost"}
+        onClick={onPrevious}
+      >
+        <SkipBack />
+      </Button>
+      <Button
+        className="[&_svg]:size-5"
+        variant={"ghost"}
+        onClick={onPlayPause}
+      >
+        {isPlaying ? <Pause /> : <Play />}
+      </Button>
+      <Button
+        className="[&_svg]:size-5"
+        variant={"ghost"}
+        onClick={onNext}
+      >
+        <SkipForward />
+      </Button>
+      <Button
+        className="[&_svg]:size-4"
+        variant={"ghost"}
+        onClick={onShuffleClick}
+        title={shuffle ? "Disable Shuffle" : "Enable Shuffle"}
+      >
+        <Shuffle className={shuffle ? "text-lime-500" : ""} />
+      </Button>
     </div>
   );
 };
