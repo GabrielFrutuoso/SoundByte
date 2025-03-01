@@ -10,6 +10,8 @@ interface PlaylistStore {
   setMaxIndex: (max: number) => void;
   nextSong: () => void;
   previousSong: () => void;
+  volume: number;
+  setVolume: (volume: number) => void;
 }
 
 export const usePlaylistStore = create<PlaylistStore>()(
@@ -18,10 +20,12 @@ export const usePlaylistStore = create<PlaylistStore>()(
       uuid: undefined,
       index: 0,
       maxIndex: 0,
+      volume: 0.5, 
 
       setUuid: (uuid) => set({ uuid, index: 0 }),
       setIndex: (index) => set({ index }),
       setMaxIndex: (max) => set({ maxIndex: max }),
+      setVolume: (volume) => set({ volume }), // Set volume
 
       nextSong: () =>
         set((state) => ({
