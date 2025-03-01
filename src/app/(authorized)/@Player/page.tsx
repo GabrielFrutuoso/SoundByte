@@ -5,29 +5,23 @@ import { usePlaylistStore } from "@/store/playlistStore";
 import { useGetToListen } from "@/hooks/requests/listen/useGetToListen";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
-import { RangeInput } from "@/components/ui/RangeInput";
 import { Progress } from "@/components/ui/progress";
 import { SoundControls, RepeatMode } from "@/components/SoundControls";
 import { usePlaylistNavigation } from "@/components/SoundControls/usePlaylistNavigation";
 import { useRepeatMode } from "@/components/SoundControls/useRepeatMode";
 import { CurrentSong } from "@/components/CurrentSong";
+import { VolumeControl } from "@/components/VolumeControl";
 
 export default function Player() {
-  const {
-    uuid,
-    index,
-    setMaxIndex,
-    volume,
-    setVolume,
-  } = usePlaylistStore();
+  const { uuid, index, setMaxIndex, volume, setVolume } = usePlaylistStore();
   const { data } = useGetToListen(uuid);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioPlayerRef = useRef<AudioPlayer>(null);
-  
+
   const { repeatMode, cycleRepeatMode } = useRepeatMode();
-  
+
   useEffect(() => {
     if (data?.songs) {
       setMaxIndex(data.songs.length);
@@ -47,7 +41,7 @@ export default function Player() {
     }
     return () => clearInterval(interval);
   }, [isPlaying, duration]);
-  
+
   const currentSong = data?.songs?.[index];
 
   useEffect(() => {
@@ -71,7 +65,7 @@ export default function Player() {
     handleClickPrevious,
     handleEnd: handleEndNavigation,
     toggleShuffle,
-    shuffle
+    shuffle,
   } = usePlaylistNavigation(data, repeatMode);
 
   const handleEnd = () => {
@@ -154,15 +148,7 @@ export default function Player() {
         onShuffleClick={toggleShuffle}
       />
 
-      <div>
-        <RangeInput
-          min={0}
-          max={1}
-          step={0.01}
-          value={safeVolume}
-          onChange={handleVolumeChange}
-        />
-      </div>
+      <VolumeControl volume={safeVolume} onVolumeChange={handleVolumeChange} />
 
       <div className="hidden">
         <AudioPlayer
@@ -177,7 +163,7 @@ export default function Player() {
           onPause={() => setIsPlaying(false)}
           volume={safeVolume}
           autoPlayAfterSrcChange={true}
-          loop={false} 
+          loop={false}
         />
       </div>
     </div>

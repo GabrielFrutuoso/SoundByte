@@ -1,4 +1,4 @@
-import { Volume, Volume1, Volume2, VolumeX } from "lucide-react";
+import { Volume1, Volume2, VolumeX } from "lucide-react";
 import { RangeInput } from "../ui/RangeInput";
 
 interface VolumeControlProps {
@@ -15,16 +15,14 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
       return <VolumeX className="shrink-0" />;
     }
     if (volume <= 0.3) {
-      return <Volume className="shrink-0" />;
-    }
-    if (volume <= 0.7) {
       return <Volume1 className="shrink-0" />;
     }
+
     return <Volume2 className="shrink-0" />;
   };
 
   return (
-    <div className="w-56 mt-8 flex items-center gap-2">
+    <div className="w-56 flex items-center gap-2">
       {getVolumeIcon(volume)}
       <RangeInput
         value={volume}
