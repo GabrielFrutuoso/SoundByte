@@ -1,6 +1,7 @@
 import React from "react";
 import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle } from "lucide-react";
 import { Button } from "../ui/button";
+import { PiRepeatLight, PiRepeatOnce } from "react-icons/pi";
 
 export enum RepeatMode {
   NONE = "NONE",
@@ -36,14 +37,14 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
       case RepeatMode.SINGLE:
         return <Repeat className="text-lime-500" />;
       case RepeatMode.PLAYLIST:
-        return <Repeat className="text-blue-500" />;
+        return <PiRepeatOnce className="text-lime-500" />;
     }
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2">
       <Button
-        className="[&_svg]:size-4"
+        className="[&_svg]:size-3.5"
         variant={"ghost"}
         onClick={onRepeatClick}
         title={`Repeat Mode: ${repeatMode}`}
@@ -58,7 +59,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
         <SkipBack />
       </Button>
       <Button
-        className="[&_svg]:size-5"
+        className="[&_svg]:size-6"
         variant={"ghost"}
         onClick={onPlayPause}
       >
@@ -72,7 +73,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
         <SkipForward />
       </Button>
       <Button
-        className="[&_svg]:size-4"
+        className="[&_svg]:size-3.5"
         variant={"ghost"}
         onClick={onShuffleClick}
         title={shuffle ? "Disable Shuffle" : "Enable Shuffle"}
