@@ -5,10 +5,11 @@ import { usePlaylistStore } from "@/store/playlistStore";
 import { useGetToListen } from "@/hooks/requests/listen/useGetToListen";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
-import { Pause, Play, SkipBack, SkipForward } from "lucide-react";
+import { Pause, Play, Repeat, SkipBack, SkipForward } from "lucide-react";
 import Image from "next/image";
 import { RangeInput } from "@/components/ui/RangeInput";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 export default function Player() {
   const {
@@ -20,6 +21,8 @@ export default function Player() {
     setIndex,
     volume,
     setVolume,
+    loop,
+    setLoop,
   } = usePlaylistStore();
   const { data } = useGetToListen(uuid);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -34,7 +37,7 @@ export default function Player() {
   }, [data?.songs, setMaxIndex]);
 
   useEffect(() => {
-    let interval : NodeJS.Timeout;
+    let interval: NodeJS.Timeout;
     if (isPlaying && audioPlayerRef.current) {
       interval = setInterval(() => {
         const audio = audioPlayerRef.current?.audio?.current;
@@ -47,6 +50,7 @@ export default function Player() {
     return () => clearInterval(interval);
   }, [isPlaying, duration]);
   const currentSong = data?.songs?.[index];
+
   useEffect(() => {
     const handleLoadedMetadata = () => {
       if (audioPlayerRef.current) {
@@ -102,11 +106,19 @@ export default function Player() {
     }
   };
 
-  const handleProgressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (audioPlayerRef.current && duration) {
-      const newTime = parseFloat(e.target.value) * duration;
-      audioPlayerRef.current.audio.current.currentTime = newTime;
-      setCurrentTime(newTime);
+      const progressBar = e.currentTarget;
+      const rect = progressBar.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const progressBarWidth = rect.width;
+      const percentage = offsetX / progressBarWidth;
+      const newTime = percentage * duration;
+
+      if (audioPlayerRef.current.audio.current) {
+        audioPlayerRef.current.audio.current.currentTime = newTime;
+        setCurrentTime(newTime);
+      }
     }
   };
 
@@ -120,20 +132,16 @@ export default function Player() {
     }
   };
 
-  const progress = duration ? currentTime / duration : 0;
+  const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
   const safeVolume = volume !== undefined ? volume : 0.5;
 
   return (
     <div className="h-24 relative border-t border-zinc-800 flex items-center justify-around">
-      <div className="w-full absolute -top-2">
-        <RangeInput
-          className="w-full p-0"
-          min={0}
-          max={1}
-          step={0.001}
-          value={progress}
-          onChange={handleProgressChange}
-        />
+      <div
+        className="w-full absolute top-0 cursor-pointer"
+        onClick={handleProgressClick}
+      >
+        <Progress value={progressPercentage} className="w-full p-0 h-1" />
       </div>
       {currentSong && (
         <div className="flex items-center text-white text-sm max-w-xs mr-4">
@@ -156,13 +164,32 @@ export default function Player() {
       )}
 
       <div className="flex items-center gap-4">
-        <Button variant={"ghost"} onClick={handleClickPrevious}>
+        <Button
+          className="[&_svg]:size-4"
+          variant={"ghost"}
+          onClick={() => setLoop(!loop)}
+        >
+          {loop ? <Repeat className="text-lime-500" /> : <Repeat />}
+        </Button>
+        <Button
+          className="[&_svg]:size-5"
+          variant={"ghost"}
+          onClick={handleClickPrevious}
+        >
           <SkipBack />
         </Button>
-        <Button variant={"ghost"} onClick={togglePlayPause}>
+        <Button
+          className="[&_svg]:size-5"
+          variant={"ghost"}
+          onClick={togglePlayPause}
+        >
           {isPlaying ? <Pause /> : <Play />}
         </Button>
-        <Button variant={"ghost"} onClick={handleClickNext}>
+        <Button
+          className="[&_svg]:size-5"
+          variant={"ghost"}
+          onClick={handleClickNext}
+        >
           <SkipForward />
         </Button>
       </div>
