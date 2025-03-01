@@ -5,8 +5,6 @@ export interface PlaylistStore {
   uuid: string | undefined;
   index: number;
   maxIndex: number;
-  loop: boolean;
-  setLoop: (loop: boolean) => void;
   shuffle: boolean;
   setShuffle: (shuffle: boolean) => void;
   setUuid: (uuid: string) => void;
@@ -18,7 +16,6 @@ export interface PlaylistStore {
   setVolume: (volume: number) => void;
 }
 
-// Fix the TypeScript issue by using 'any' as a temporary workaround
 export const usePlaylistStore = create<PlaylistStore>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (persist as any)(
@@ -28,14 +25,11 @@ export const usePlaylistStore = create<PlaylistStore>(
         uuid: undefined,
         index: 0,
         maxIndex: 0,
-        loop: false,
         shuffle: false,
         volume: 0.5,
-        
         setUuid: (uuid: string) => set({ uuid, index: 0 }),
         setIndex: (index: number) => set({ index }),
         setMaxIndex: (max: number) => set({ maxIndex: max }),
-        setLoop: (loop: boolean) => set({ loop }),
         setShuffle: (shuffle: boolean) => set({ shuffle }),
         setVolume: (volume: number) => set({ volume }),
 
