@@ -5,31 +5,29 @@ import { usePlaylistStore } from "@/store/playlistStore";
 import { useGetToListen } from "@/hooks/requests/listen/useGetToListen";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
-import { Pause, Play, Repeat, SkipBack, SkipForward } from "lucide-react";
-import Image from "next/image";
 import { RangeInput } from "@/components/ui/RangeInput";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { SoundControls, RepeatMode } from "@/components/SoundControls";
+import { usePlaylistNavigation } from "@/components/SoundControls/usePlaylistNavigation";
+import { useRepeatMode } from "@/components/SoundControls/useRepeatMode";
+import { CurrentSong } from "@/components/CurrentSong";
 
 export default function Player() {
   const {
     uuid,
     index,
-    nextSong,
-    previousSong,
     setMaxIndex,
-    setIndex,
     volume,
     setVolume,
-    loop,
-    setLoop,
   } = usePlaylistStore();
   const { data } = useGetToListen(uuid);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioPlayerRef = useRef<AudioPlayer>(null);
-
+  
+  const { repeatMode, cycleRepeatMode } = useRepeatMode();
+  
   useEffect(() => {
     if (data?.songs) {
       setMaxIndex(data.songs.length);
@@ -49,6 +47,7 @@ export default function Player() {
     }
     return () => clearInterval(interval);
   }, [isPlaying, duration]);
+  
   const currentSong = data?.songs?.[index];
 
   useEffect(() => {
@@ -67,30 +66,24 @@ export default function Player() {
     }
   }, [currentSong]);
 
-  const handleClickNext = () => {
-    console.log("click next");
-    if (index === (data?.songs?.length || 0) - 1) {
-      setIndex(0);
-    } else {
-      nextSong();
-    }
-  };
-
-  const handleClickPrevious = () => {
-    if (index === 0) {
-      setIndex((data?.songs?.length || 0) - 1);
-    } else {
-      previousSong();
-    }
-  };
+  const {
+    handleClickNext,
+    handleClickPrevious,
+    handleEnd: handleEndNavigation,
+    toggleShuffle,
+    shuffle
+  } = usePlaylistNavigation(data, repeatMode);
 
   const handleEnd = () => {
-    console.log("end");
-    if (index === (data?.songs?.length || 0) - 1) {
-      setIndex(0);
-    } else {
-      nextSong();
+    if (repeatMode === RepeatMode.SINGLE) {
+      if (audioPlayerRef.current?.audio?.current) {
+        audioPlayerRef.current.audio.current.currentTime = 0;
+        audioPlayerRef.current.audio.current.play();
+        return;
+      }
     }
+
+    handleEndNavigation(setIsPlaying);
   };
 
   const togglePlayPause = () => {
@@ -143,56 +136,23 @@ export default function Player() {
       >
         <Progress value={progressPercentage} className="w-full p-0 h-1" />
       </div>
-      {currentSong && (
-        <div className="flex items-center text-white text-sm max-w-xs mr-4">
-          <div className="w-12 h-12 mr-3">
-            <Image
-              width={48}
-              height={48}
-              src={currentSong.bannerSrc || "e"}
-              alt="Album Cover"
-              className="w-full h-full object-cover rounded"
-            />
-          </div>
-          <div className="truncate">
-            <div className="font-medium truncate">{currentSong.title}</div>
-            <div className="text-zinc-400 text-xs truncate">
-              {currentSong.artist}
-            </div>
-          </div>
-        </div>
-      )}
+      <CurrentSong
+        artist={currentSong?.artist || ""}
+        songName={currentSong?.title || ""}
+        cover={currentSong?.bannerSrc || ""}
+        songId={currentSong?.id}
+      />
 
-      <div className="flex items-center gap-4">
-        <Button
-          className="[&_svg]:size-4"
-          variant={"ghost"}
-          onClick={() => setLoop(!loop)}
-        >
-          {loop ? <Repeat className="text-lime-500" /> : <Repeat />}
-        </Button>
-        <Button
-          className="[&_svg]:size-5"
-          variant={"ghost"}
-          onClick={handleClickPrevious}
-        >
-          <SkipBack />
-        </Button>
-        <Button
-          className="[&_svg]:size-5"
-          variant={"ghost"}
-          onClick={togglePlayPause}
-        >
-          {isPlaying ? <Pause /> : <Play />}
-        </Button>
-        <Button
-          className="[&_svg]:size-5"
-          variant={"ghost"}
-          onClick={handleClickNext}
-        >
-          <SkipForward />
-        </Button>
-      </div>
+      <SoundControls
+        isPlaying={isPlaying}
+        repeatMode={repeatMode}
+        shuffle={shuffle}
+        onPlayPause={togglePlayPause}
+        onNext={handleClickNext}
+        onPrevious={handleClickPrevious}
+        onRepeatClick={cycleRepeatMode}
+        onShuffleClick={toggleShuffle}
+      />
 
       <div>
         <RangeInput
@@ -217,6 +177,7 @@ export default function Player() {
           onPause={() => setIsPlaying(false)}
           volume={safeVolume}
           autoPlayAfterSrcChange={true}
+          loop={false} 
         />
       </div>
     </div>

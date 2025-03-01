@@ -20,7 +20,7 @@ export const CurrentSong = ({
   const { user } = useUserStore();
   const { data: likedSongs } = useGetLikedSongs(user?.id || "");
   const isLikedSong = likedSongs?.some(
-    (likedSong) => likedSong.song.id === songId
+    (likedSong: { song: { id: string } }) => likedSong.song.id === songId
   );
 
   return (
