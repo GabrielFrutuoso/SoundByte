@@ -35,9 +35,9 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
       case RepeatMode.NONE:
         return <Repeat />;
       case RepeatMode.SINGLE:
-        return <Repeat className="text-lime-500" />;
-      case RepeatMode.PLAYLIST:
         return <PiRepeatOnce className="text-lime-500" />;
+      case RepeatMode.PLAYLIST:
+        return <Repeat className="text-lime-500" />;
     }
   };
 
