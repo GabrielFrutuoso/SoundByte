@@ -1,7 +1,7 @@
 import React from "react";
 import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle } from "lucide-react";
 import { Button } from "../ui/button";
-import { PiRepeatLight, PiRepeatOnce } from "react-icons/pi";
+import { PiRepeatOnce } from "react-icons/pi";
 
 export enum RepeatMode {
   NONE = "NONE",
