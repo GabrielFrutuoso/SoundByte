@@ -18,6 +18,7 @@ interface SoundControlsProps {
   onPrevious: () => void;
   onRepeatClick: () => void;
   onShuffleClick: () => void;
+  disabled?: boolean;
 }
 
 export const SoundControls: React.FC<SoundControlsProps> = ({
@@ -29,6 +30,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
   onPrevious,
   onRepeatClick,
   onShuffleClick,
+  disabled = false,
 }) => {
   const getRepeatButton = () => {
     switch (repeatMode) {
@@ -48,6 +50,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
         variant={"ghost"}
         onClick={onRepeatClick}
         title={`Repeat Mode: ${repeatMode}`}
+        disabled={disabled}
       >
         {getRepeatButton()}
       </Button>
@@ -55,6 +58,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
         className="[&_svg]:size-5"
         variant={"ghost"}
         onClick={onPrevious}
+        disabled={disabled}
       >
         <SkipBack />
       </Button>
@@ -62,6 +66,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
         className="[&_svg]:size-6"
         variant={"ghost"}
         onClick={onPlayPause}
+        disabled={disabled}
       >
         {isPlaying ? <Pause /> : <Play />}
       </Button>
@@ -69,6 +74,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
         className="[&_svg]:size-5"
         variant={"ghost"}
         onClick={onNext}
+        disabled={disabled}
       >
         <SkipForward />
       </Button>
@@ -77,6 +83,7 @@ export const SoundControls: React.FC<SoundControlsProps> = ({
         variant={"ghost"}
         onClick={onShuffleClick}
         title={shuffle ? "Disable Shuffle" : "Enable Shuffle"}
+        disabled={disabled}
       >
         <Shuffle className={shuffle ? "text-lime-500" : ""} />
       </Button>

@@ -49,6 +49,16 @@ export default function Player() {
   }, [isPlaying, duration]);
 
   const currentSong = data?.songs?.[index];
+  const hasSongSource = !!currentSong?.songURL;
+
+  useEffect(() => {
+    if (!hasSongSource && isPlaying) {
+      setIsPlaying(false);
+      if (audioPlayerRef.current?.audio?.current) {
+        audioPlayerRef.current.audio.current.pause();
+      }
+    }
+  }, [hasSongSource, isPlaying]);
 
   useEffect(() => {
     const handleLoadedMetadata = () => {
@@ -87,6 +97,8 @@ export default function Player() {
   };
 
   const togglePlayPause = () => {
+    if (!hasSongSource) return;
+    
     if (audioPlayerRef.current) {
       const audio = audioPlayerRef.current?.audio?.current;
       if (audio?.paused) {
@@ -129,16 +141,16 @@ export default function Player() {
   const safeVolume = volume !== undefined ? volume : 0.5;
 
   return (
-    <div className="h-24 relative border-t border-zinc-800 flex items-center justify-around">
+    <div className={`h-24 relative border-t border-zinc-800 flex items-center justify-around ${!hasSongSource ? 'opacity-70' : ''}`}>
       <div
-        className="w-full absolute top-0 cursor-pointer"
-        onClick={handleProgressClick}
+        className={`w-full absolute top-0 ${hasSongSource ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+        onClick={hasSongSource ? handleProgressClick : undefined}
       >
         <Progress value={progressPercentage} className="w-full p-0 h-1" />
       </div>
       <CurrentSong
         artist={currentSong?.artist || ""}
-        songName={currentSong?.title || ""}
+        songName={currentSong?.title || "No song selected"}
         cover={currentSong?.bannerSrc || ""}
         songId={currentSong?.id}
       />
@@ -152,23 +164,28 @@ export default function Player() {
         onPrevious={handleClickPrevious}
         onRepeatClick={cycleRepeatMode}
         onShuffleClick={toggleShuffle}
+        disabled={!hasSongSource}
       />
 
-      <VolumeControl volume={safeVolume} onVolumeChange={handleVolumeChange} />
+      <VolumeControl 
+        volume={safeVolume} 
+        onVolumeChange={handleVolumeChange} 
+        disabled={!hasSongSource}
+      />
 
       <div className="hidden">
         <AudioPlayer
           ref={audioPlayerRef}
-          src={currentSong?.songURL}
+          src={hasSongSource ? currentSong?.songURL : undefined}
           showSkipControls={true}
           showJumpControls={false}
-          onClickNext={handleClickNext}
-          onClickPrevious={handleClickPrevious}
-          onEnded={handleEnd}
-          onPlay={() => setIsPlaying(true)}
+          onClickNext={hasSongSource ? handleClickNext : undefined}
+          onClickPrevious={hasSongSource ? handleClickPrevious : undefined}
+          onEnded={hasSongSource ? handleEnd : undefined}
+          onPlay={() => hasSongSource && setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
           volume={safeVolume}
-          autoPlayAfterSrcChange={true}
+          autoPlayAfterSrcChange={hasSongSource}
           loop={false}
           muted={isMuted}
         />
