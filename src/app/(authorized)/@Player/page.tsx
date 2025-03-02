@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePlaylistStore } from "@/store/playlistStore";
 import { useGetToListen } from "@/hooks/requests/listen/useGetToListen";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
@@ -11,9 +10,10 @@ import { usePlaylistNavigation } from "@/components/SoundControls/usePlaylistNav
 import { useRepeatMode } from "@/components/SoundControls/useRepeatMode";
 import { CurrentSong } from "@/components/CurrentSong";
 import { VolumeControl } from "@/components/VolumeControl";
+import { usePlayerStore } from "@/store/playlistStore";
 
 export default function Player() {
-  const { uuid, index, setMaxIndex, volume, setVolume } = usePlaylistStore();
+  const { uuid, index, setMaxIndex, volume, setVolume, isMuted } = usePlayerStore();
   const { data } = useGetToListen(uuid);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -21,6 +21,12 @@ export default function Player() {
   const audioPlayerRef = useRef<AudioPlayer>(null);
 
   const { repeatMode, cycleRepeatMode } = useRepeatMode();
+
+  useEffect(() => {
+    if (audioPlayerRef.current?.audio?.current) {
+      audioPlayerRef.current.audio.current.muted = isMuted;
+    }
+  }, [isMuted]);
 
   useEffect(() => {
     if (data?.songs) {
@@ -164,6 +170,7 @@ export default function Player() {
           volume={safeVolume}
           autoPlayAfterSrcChange={true}
           loop={false}
+          muted={isMuted}
         />
       </div>
     </div>
