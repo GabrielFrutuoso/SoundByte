@@ -1,7 +1,7 @@
 import { Heart, Pause, Play } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { usePlaylistStore } from "@/store/playlistStore";
+import { usePlayerStore } from "@/store/playlistStore";
 import { SearchResultType } from "@/app/types/SearchResult.type";
 import { useUserStore } from "@/store/userStore";
 import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
@@ -25,7 +25,7 @@ export const SearchResultItem = ({
   result: SearchResultType;
   type: string;
 }) => {
-  const { setUuid, uuid } = usePlaylistStore();
+  const { setUuid, uuid } = usePlayerStore();
   const { play, pause, isPlaying } = useAudioPlayer();
   const { mutate: likePlaylist } = useLikePlaylist();
   const { mutate: disLikePlaylist } = useDisikePlaylist();

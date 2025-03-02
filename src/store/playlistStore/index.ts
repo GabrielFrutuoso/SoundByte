@@ -1,11 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export interface PlaylistStore {
+export interface PlayerStore {
   uuid: string | undefined;
   index: number;
   maxIndex: number;
   shuffle: boolean;
+  isMuted: boolean;
+  setMuted: (isMuted: boolean) => void;
   setShuffle: (shuffle: boolean) => void;
   setUuid: (uuid: string) => void;
   setIndex: (index: number) => void;
@@ -16,7 +18,7 @@ export interface PlaylistStore {
   setVolume: (volume: number) => void;
 }
 
-export const usePlaylistStore = create<PlaylistStore>(
+export const usePlayerStore = create<PlayerStore>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (persist as any)(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,15 +28,17 @@ export const usePlaylistStore = create<PlaylistStore>(
         index: 0,
         maxIndex: 0,
         shuffle: false,
+        isMuted: false,
         volume: 0.5,
         setUuid: (uuid: string) => set({ uuid, index: 0 }),
         setIndex: (index: number) => set({ index }),
         setMaxIndex: (max: number) => set({ maxIndex: max }),
         setShuffle: (shuffle: boolean) => set({ shuffle }),
         setVolume: (volume: number) => set({ volume }),
+        setMuted: (isMuted: boolean) => set({ isMuted }),
 
         nextSong: () =>
-          set((state: PlaylistStore) => {
+          set((state: PlayerStore) => {
             if (state.maxIndex === 0) return {};
             
             if (state.shuffle) {
@@ -46,7 +50,7 @@ export const usePlaylistStore = create<PlaylistStore>(
           }),
 
         previousSong: () =>
-          set((state: PlaylistStore) => {
+          set((state: PlayerStore) => {
             if (state.maxIndex === 0) return {};
             
             if (state.shuffle) {
@@ -58,6 +62,6 @@ export const usePlaylistStore = create<PlaylistStore>(
           }),
       };
     },
-    { name: "playlist-storage" }
+    { name: "Player-storage" }
   )
 );

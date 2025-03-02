@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { usePlaylistStore } from "@/store/playlistStore";
 import { RepeatMode } from "./index";
+import { usePlayerStore } from "@/store/playlistStore";
 
 interface Song {
   id: string;
@@ -24,7 +24,7 @@ export const usePlaylistNavigation = (
     previousSong, 
     shuffle, 
     setShuffle 
-  } = usePlaylistStore();
+  } = usePlayerStore();
   
   const [playedSongs, setPlayedSongs] = useState<Set<number>>(new Set());
 

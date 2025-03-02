@@ -11,12 +11,12 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "../ui/context-menu";
-import { usePlaylistStore } from "@/store/playlistStore";
 import { toast } from "@/hooks/use-toast";
 import { useUserStore } from "@/store/userStore";
 import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist";
 import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { usePlayerStore } from "@/store/playlistStore";
 
 export interface PlaylistItemProps {
   id: string;
@@ -37,7 +37,7 @@ export const PlaylistItem = ({
   isInMenu,
   isCollapsed,
 }: PlaylistItemProps & baseStyleProps) => {
-  const { setUuid, uuid } = usePlaylistStore();
+  const { setUuid, uuid } = usePlayerStore();
   const { play, pause, isPlaying } = useAudioPlayer();
 
   const { user: currentUser } = useUserStore();
