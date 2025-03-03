@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
 import { Heart, Music } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
@@ -19,13 +19,20 @@ export const CurrentSong = ({
 }: CurrentSongProps) => {
   const { user } = useUserStore();
   const { data: likedSongs } = useGetLikedSongs(user?.id || "");
-  const isLikedSong = likedSongs?.some(
-    (likedSong: { song: { id: string } }) => likedSong.song.id === songId
-  );
+  
+  const isLikedSong = useMemo(() => {
+    if (!songId || !likedSongs) return false;
+    return likedSongs.some(
+      (likedSong: { song: { id: string } }) => likedSong.song.id === songId
+    );
+  }, [likedSongs, songId]);
+
+
+  const hasContent = !!cover;
 
   return (
     <div className="flex items-center gap-4">
-      {songName ? (
+      {hasContent ? (
         <>
           <Image
             className="rounded-lg aspect-square object-cover"
@@ -49,10 +56,8 @@ export const CurrentSong = ({
             <Music className="text-zinc-600" />
           </div>
           <div className="sm:hidden md:flex md:flex-col">
-            <h1 className="text-xl font-bold">sem música tocando</h1>
-          </div>
-          <div>
-            <Heart className="cursor-pointer text-secondary-foreground" />
+            <h1 className="text-xl font-bold">No song selected</h1>
+            <p>Select a song to play</p>
           </div>
         </>
       )}

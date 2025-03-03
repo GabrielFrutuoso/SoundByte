@@ -4,9 +4,12 @@ import { persist } from "zustand/middleware";
 interface AudioStore {
   isPlaying: boolean;
   currentUrl: string | null;
+  songId: string | null;
   play: () => Promise<void>;
   pause: () => void;
   togglePlay: () => Promise<void>;
+  setCurrentUrl: (url: string | null) => void;
+  setSongId: (id: string | null) => void;
 }
 
 export const useAudioPlayer = create<AudioStore>()(
@@ -14,17 +17,34 @@ export const useAudioPlayer = create<AudioStore>()(
     (set, get) => ({
       isPlaying: false,
       currentUrl: null,
+      songId: null,
+
+      setCurrentUrl: (url: string | null) => {
+        if (url !== get().currentUrl) {
+          set({ currentUrl: url });
+        }
+      },
+
+      setSongId: (id: string | null) => {
+        if (id !== get().songId) {
+          set({ songId: id });
+        }
+      },
 
       play: async () => {
         try {
-          set({ isPlaying: true });
+          if (!get().isPlaying) {
+            set({ isPlaying: true });
+          }
         } catch (error) {
           console.error("Play error:", error);
         }
       },
 
       pause: () => {
-        set({ isPlaying: false });
+        if (get().isPlaying) {
+          set({ isPlaying: false });
+        }
       },
 
       togglePlay: async () => {

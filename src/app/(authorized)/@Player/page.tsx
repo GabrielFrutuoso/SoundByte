@@ -11,14 +11,17 @@ import { useRepeatMode } from "@/components/SoundControls/useRepeatMode";
 import { CurrentSong } from "@/components/CurrentSong";
 import { VolumeControl } from "@/components/VolumeControl";
 import { usePlayerStore } from "@/store/playlistStore";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 export default function Player() {
-  const { uuid, index, setMaxIndex, volume, setVolume, isMuted } = usePlayerStore();
+  const { uuid, index, setMaxIndex, volume, setVolume, isMuted } =
+    usePlayerStore();
   const { data } = useGetToListen(uuid);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioPlayerRef = useRef<AudioPlayer>(null);
+  const audioPlayer = useAudioPlayer();
 
   const { repeatMode, cycleRepeatMode } = useRepeatMode();
 
@@ -98,18 +101,74 @@ export default function Player() {
 
   const togglePlayPause = () => {
     if (!hasSongSource) return;
-    
+
     if (audioPlayerRef.current) {
       const audio = audioPlayerRef.current?.audio?.current;
       if (audio?.paused) {
         audio.play();
         setIsPlaying(true);
+        audioPlayer.play();
       } else {
         audio?.pause();
         setIsPlaying(false);
+        audioPlayer.pause();
       }
     }
   };
+
+  // When the song changes, update the audio player
+  useEffect(() => {
+    // Reset state when song changes
+    setCurrentTime(0);
+    setDuration(0);
+
+    // If there's a valid song source and isPlaying is true, play the song
+    if (hasSongSource && audioPlayer.isPlaying) {
+      if (audioPlayerRef.current?.audio?.current) {
+        audioPlayerRef.current.audio.current.play().catch((err) => {
+          console.error("Error playing audio:", err);
+          setIsPlaying(false);
+          audioPlayer.pause();
+        });
+      }
+    }
+  }, [uuid, index, hasSongSource]);
+
+  // Sync local state with audioPlayer state - avoiding circular updates
+  useEffect(() => {
+    // This effect syncs the audioPlayer hook state with the local playing state
+    // BUT only runs when the audioPlayer.isPlaying changes
+    const syncWithAudioPlayer = () => {
+      if (audioPlayer.isPlaying && !isPlaying && hasSongSource) {
+        if (audioPlayerRef.current?.audio?.current) {
+          audioPlayerRef.current.audio.current.play().catch(() => {
+            // If play fails, update both states to avoid inconsistency
+            setIsPlaying(false);
+          });
+          setIsPlaying(true);
+        }
+      } else if (!audioPlayer.isPlaying && isPlaying) {
+        if (audioPlayerRef.current?.audio?.current) {
+          audioPlayerRef.current.audio.current.pause();
+          setIsPlaying(false);
+        }
+      }
+    };
+
+    syncWithAudioPlayer();
+  }, [audioPlayer.isPlaying, hasSongSource]);
+
+  useEffect(() => {
+    const prevAudioPlayerIsPlaying = audioPlayer.isPlaying;
+
+    if (isPlaying !== prevAudioPlayerIsPlaying) {
+      if (isPlaying) {
+        audioPlayer.play();
+      } else {
+        audioPlayer.pause();
+      }
+    }
+  }, [isPlaying]);
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (audioPlayerRef.current && duration) {
@@ -141,9 +200,15 @@ export default function Player() {
   const safeVolume = volume !== undefined ? volume : 0.5;
 
   return (
-    <div className={`h-24 relative border-t border-zinc-800 flex items-center justify-around ${!hasSongSource ? 'opacity-70' : ''}`}>
+    <div
+      className={`h-24 relative border-t border-zinc-800 flex items-center justify-around ${
+        !hasSongSource ? "opacity-70" : ""
+      }`}
+    >
       <div
-        className={`w-full absolute top-0 ${hasSongSource ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+        className={`w-full absolute top-0 ${
+          hasSongSource ? "cursor-pointer" : "cursor-not-allowed"
+        }`}
         onClick={hasSongSource ? handleProgressClick : undefined}
       >
         <Progress value={progressPercentage} className="w-full p-0 h-1" />
@@ -167,9 +232,9 @@ export default function Player() {
         disabled={!hasSongSource}
       />
 
-      <VolumeControl 
-        volume={safeVolume} 
-        onVolumeChange={handleVolumeChange} 
+      <VolumeControl
+        volume={safeVolume}
+        onVolumeChange={handleVolumeChange}
         disabled={!hasSongSource}
       />
 

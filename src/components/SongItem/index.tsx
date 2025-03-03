@@ -7,7 +7,8 @@ import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 export const SongItem = ({ id, bannerSrc, title, artist }: SongItemProps) => {
   const { uuid, setUuid, setIndex } = usePlayerStore();
-  const { play, pause, isPlaying } = useAudioPlayer();
+  const audioPlayer = useAudioPlayer();
+  const isCurrentlyPlaying = audioPlayer.isPlaying && uuid === id;
 
   const handleSongSelect = () => {
     setUuid(id);
@@ -23,17 +24,18 @@ export const SongItem = ({ id, bannerSrc, title, artist }: SongItemProps) => {
     >
       <div className="relative">
         <button
-          onClick={() => {
-            if (isPlaying && uuid === id) {
-              pause();
+          onClick={(e) => {
+            e.stopPropagation();
+            if (isCurrentlyPlaying) {
+              audioPlayer.pause();
             } else {
               handleSongSelect();
-              play();
+              audioPlayer.play();
             }
           }}
           className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg"
         >
-          {isPlaying && uuid === id ? <Pause size={40} /> : <Play size={40} />}
+          {isCurrentlyPlaying ? <Pause size={40} /> : <Play size={40} />}
         </button>
         <Image
           className="w-full object-cover aspect-square rounded-lg"
