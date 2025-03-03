@@ -116,13 +116,14 @@ export default function Player() {
     }
   };
 
-  // When the song changes, update the audio player
   useEffect(() => {
-    // Reset state when song changes
     setCurrentTime(0);
     setDuration(0);
 
-    // If there's a valid song source and isPlaying is true, play the song
+    if (audioPlayerRef.current?.audio?.current) {
+      audioPlayerRef.current.audio.current.volume = volume;
+      audioPlayerRef.current.audio.current.muted = isMuted;
+    }
     if (hasSongSource && audioPlayer.isPlaying) {
       if (audioPlayerRef.current?.audio?.current) {
         audioPlayerRef.current.audio.current.play().catch((err) => {
@@ -132,17 +133,13 @@ export default function Player() {
         });
       }
     }
-  }, [uuid, index, hasSongSource]);
+  }, [uuid, index, hasSongSource, volume, isMuted]);
 
-  // Sync local state with audioPlayer state - avoiding circular updates
   useEffect(() => {
-    // This effect syncs the audioPlayer hook state with the local playing state
-    // BUT only runs when the audioPlayer.isPlaying changes
     const syncWithAudioPlayer = () => {
       if (audioPlayer.isPlaying && !isPlaying && hasSongSource) {
         if (audioPlayerRef.current?.audio?.current) {
           audioPlayerRef.current.audio.current.play().catch(() => {
-            // If play fails, update both states to avoid inconsistency
             setIsPlaying(false);
           });
           setIsPlaying(true);
@@ -192,12 +189,19 @@ export default function Player() {
       setVolume(newVolume);
       if (audioPlayerRef.current?.audio?.current) {
         audioPlayerRef.current.audio.current.volume = newVolume;
+
+        if (newVolume === 0) {
+          if (!isMuted) {
+            audioPlayerRef.current.audio.current.muted = true;
+          }
+        } else if (isMuted) {
+          audioPlayerRef.current.audio.current.muted = false;
+        }
       }
     }
   };
 
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
-  const safeVolume = volume !== undefined ? volume : 0.5;
 
   return (
     <div
@@ -233,7 +237,7 @@ export default function Player() {
       />
 
       <VolumeControl
-        volume={safeVolume}
+        volume={volume}
         onVolumeChange={handleVolumeChange}
         disabled={!hasSongSource}
       />
@@ -249,7 +253,7 @@ export default function Player() {
           onEnded={hasSongSource ? handleEnd : undefined}
           onPlay={() => hasSongSource && setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
-          volume={safeVolume}
+          volume={volume}
           autoPlayAfterSrcChange={hasSongSource}
           loop={false}
           muted={isMuted}
