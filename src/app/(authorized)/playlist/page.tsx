@@ -10,15 +10,71 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetPlaylistById } from "@/hooks/requests/playlist/useGetPlaylistById";
-import { Ellipsis, Heart, Music, Play } from "lucide-react";
+import { Ellipsis, Heart, Music, Pause, Play } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
+import { usePlayerStore } from "@/store/playlistStore";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 export default function Playlist() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { data: playlist } = useGetPlaylistById(id as string);
+
+  const { setUuid, setIndex, uuid, index } = usePlayerStore();
+  const audioPlayer = useAudioPlayer();
+
+  const isCurrentPlaylist = useMemo(() => uuid === id, [uuid, id]);
+
+  const isPlaying = audioPlayer.isPlaying;
+
+  const handlePlayPlaylist = useCallback(() => {
+    if (isCurrentPlaylist && isPlaying) {
+      audioPlayer.pause();
+    } else if (isCurrentPlaylist && !isPlaying) {
+      audioPlayer.play();
+    } else {
+      setUuid(id as string);
+      setIndex(0);
+      audioPlayer.play();
+    }
+  }, [id, setUuid, setIndex, audioPlayer, isCurrentPlaylist, isPlaying]);
+
+  const handlePlaySong = useCallback(
+    (songIndex: number) => {
+      if (isCurrentPlaylist && index === songIndex && isPlaying) {
+        audioPlayer.pause();
+      } else if (isCurrentPlaylist && index === songIndex && !isPlaying) {
+        audioPlayer.play();
+      } else {
+        setUuid(id as string);
+        setIndex(songIndex);
+        audioPlayer.play();
+      }
+    },
+    [id, setUuid, setIndex, audioPlayer, isCurrentPlaylist, index, isPlaying]
+  );
+
+  const getPlayButton = () => {
+    if (isCurrentPlaylist && isPlaying) {
+      return (
+        <Pause
+          size={40}
+          className="cursor-pointer hover:text-lime-500"
+          onClick={handlePlayPlaylist}
+        />
+      );
+    } else {
+      return (
+        <Play
+          size={40}
+          className="cursor-pointer hover:text-lime-500"
+          onClick={handlePlayPlaylist}
+        />
+      );
+    }
+  };
 
   return (
     <div className="h-full flex flex-col px-12 pt-12 space-y-4">
@@ -41,7 +97,7 @@ export default function Playlist() {
             </h2>
           </div>
           <div className="flex gap-3">
-            <Play size={40} />
+            {getPlayButton()}
             <Heart className="text-lime-500" size={40} />
             <Ellipsis size={40} />
           </div>
@@ -61,12 +117,30 @@ export default function Playlist() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {playlist?.songs.map((song, index) => (
+            {playlist?.songs.map((song, songIndex) => (
               <TableRow
                 key={song?.song?.id}
-                className="hover:bg-zinc-800 text-lg font-semibold cursor-pointer"
+                className={`hover:bg-zinc-800 text-lg font-semibold cursor-pointer ${
+                  isCurrentPlaylist && index === songIndex ? "bg-zinc-800" : ""
+                }`}
+                onClick={() => handlePlaySong(songIndex)}
               >
-                <TableCell>{index + 1}</TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                    {isCurrentPlaylist && index === songIndex && isPlaying ? (
+                      <Pause size={16} className="text-lime-500 mr-2" />
+                    ) : (
+                      <Play
+                        size={16}
+                        className={`${
+                          isCurrentPlaylist && index === songIndex
+                            ? "text-lime-500"
+                            : ""
+                        } mr-2`}
+                      />
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell>{song?.song?.title}</TableCell>
                 <TableCell>{song?.song?.artist}</TableCell>
                 <TableCell>{song?.song?.user?.username}</TableCell>
