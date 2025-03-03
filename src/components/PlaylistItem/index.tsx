@@ -11,12 +11,12 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "../ui/context-menu";
-import { usePlaylistStore } from "@/store/playlistStore";
 import { toast } from "@/hooks/use-toast";
 import { useUserStore } from "@/store/userStore";
 import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist";
 import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { usePlayerStore } from "@/store/playlistStore";
 
 export interface PlaylistItemProps {
   id: string;
@@ -37,8 +37,8 @@ export const PlaylistItem = ({
   isInMenu,
   isCollapsed,
 }: PlaylistItemProps & baseStyleProps) => {
-  const { setUuid, uuid } = usePlaylistStore();
-  const { play, pause, isPlaying } = useAudioPlayer();
+  const { setUuid, uuid } = usePlayerStore();
+  const audioPlayer = useAudioPlayer();
 
   const { user: currentUser } = useUserStore();
 
@@ -60,7 +60,7 @@ export const PlaylistItem = ({
     }
   };
 
-  const isCurrentPlaylist = uuid === id;
+  const isPlaying = audioPlayer.isPlaying && uuid === id;
 
   return (
     <ContextMenu>
@@ -68,22 +68,23 @@ export const PlaylistItem = ({
         <div
           className={baseStyle({
             variant,
-            className: isCurrentPlaylist ? "text-lime-500" : "",
+            className: uuid === id ? "text-lime-500" : "",
           })}
         >
           <div className="relative group">
             <button
-              onClick={() => {
-                if (isPlaying && isCurrentPlaylist) {
-                  pause();
+              onClick={(e) => {
+                e.stopPropagation();
+                if (isPlaying) {
+                  audioPlayer.pause();
                 } else {
                   handlePlaylistSelect();
-                  play();
+                  audioPlayer.play();
                 }
               }}
               className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg"
             >
-              {isPlaying && isCurrentPlaylist ? <Pause /> : <Play />}
+              {isPlaying ? <Pause /> : <Play />}
             </button>
             <Image
               className={`${

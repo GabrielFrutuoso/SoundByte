@@ -1,74 +1,264 @@
 "use client";
 
-import { CurrentSong } from "@/components/CurrentSong";
-import { SoundControls } from "@/components/SoundControls";
-import { VolumeControl } from "@/components/VolumeControl";
-import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { useEffect, useRef, useState } from "react";
 import { useGetToListen } from "@/hooks/requests/listen/useGetToListen";
-import { usePlaylistStore } from "@/store/playlistStore";
-import { useEffect } from "react";
+import AudioPlayer from "react-h5-audio-player";
+import "react-h5-audio-player/lib/styles.css";
+import { Progress } from "@/components/ui/progress";
+import { SoundControls, RepeatMode } from "@/components/SoundControls";
+import { usePlaylistNavigation } from "@/components/SoundControls/usePlaylistNavigation";
+import { useRepeatMode } from "@/components/SoundControls/useRepeatMode";
+import { CurrentSong } from "@/components/CurrentSong";
+import { VolumeControl } from "@/components/VolumeControl";
+import { usePlayerStore } from "@/store/playlistStore";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
 export default function Player() {
-  const { uuid, index, nextSong, previousSong, setMaxIndex } =
-    usePlaylistStore();
+  const { uuid, index, setMaxIndex, volume, setVolume, isMuted } =
+    usePlayerStore();
   const { data } = useGetToListen(uuid);
-  const {
-    isPlaying,
-    play,
-    pause,
-    setSong,
-    currentTime,
-    duration,
-    volume,
-    setVolume,
-    setCurrentTime,
-    repeat,
-    toggleRepeat,
-  } = useAudioPlayer();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioPlayerRef = useRef<AudioPlayer>(null);
+  const audioPlayer = useAudioPlayer();
 
-  const currentSong = data?.songs?.[index];
+  const { repeatMode, cycleRepeatMode } = useRepeatMode();
+
+  useEffect(() => {
+    if (audioPlayerRef.current?.audio?.current) {
+      audioPlayerRef.current.audio.current.muted = isMuted;
+    }
+  }, [isMuted]);
 
   useEffect(() => {
     if (data?.songs) {
       setMaxIndex(data.songs.length);
-      if (!data.songs.length) {
-        pause();
-      }
     }
-  }, [data?.songs, setMaxIndex, pause]);
+  }, [data?.songs, setMaxIndex]);
 
   useEffect(() => {
-    if (currentSong?.songURL) {
-      setSong(currentSong.songURL);
-      if (isPlaying) play();
-    } else {
-      pause();
+    let interval: NodeJS.Timeout;
+    if (isPlaying && audioPlayerRef.current) {
+      interval = setInterval(() => {
+        const audio = audioPlayerRef.current?.audio?.current;
+        if (audio) {
+          setCurrentTime(audio.currentTime);
+          if (!duration && audio.duration) setDuration(audio.duration);
+        }
+      }, 100);
     }
-  }, [currentSong?.songURL, setSong, play, isPlaying, pause]);
+    return () => clearInterval(interval);
+  }, [isPlaying, duration]);
+
+  const currentSong = data?.songs?.[index];
+  const hasSongSource = !!currentSong?.songURL;
+
+  useEffect(() => {
+    if (!hasSongSource && isPlaying) {
+      setIsPlaying(false);
+      if (audioPlayerRef.current?.audio?.current) {
+        audioPlayerRef.current.audio.current.pause();
+      }
+    }
+  }, [hasSongSource, isPlaying]);
+
+  useEffect(() => {
+    const handleLoadedMetadata = () => {
+      if (audioPlayerRef.current) {
+        const audio = audioPlayerRef.current?.audio?.current;
+        if (audio) setDuration(audio.duration);
+      }
+    };
+
+    if (audioPlayerRef.current?.audio?.current) {
+      const audio = audioPlayerRef.current.audio.current;
+      audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+      return () =>
+        audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+    }
+  }, [currentSong]);
+
+  const {
+    handleClickNext,
+    handleClickPrevious,
+    handleEnd: handleEndNavigation,
+    toggleShuffle,
+    shuffle,
+  } = usePlaylistNavigation(data, repeatMode);
+
+  const handleEnd = () => {
+    if (repeatMode === RepeatMode.SINGLE) {
+      if (audioPlayerRef.current?.audio?.current) {
+        audioPlayerRef.current.audio.current.currentTime = 0;
+        audioPlayerRef.current.audio.current.play();
+        return;
+      }
+    }
+
+    handleEndNavigation(setIsPlaying);
+  };
+
+  const togglePlayPause = () => {
+    if (!hasSongSource) return;
+
+    if (audioPlayerRef.current) {
+      const audio = audioPlayerRef.current?.audio?.current;
+      if (audio?.paused) {
+        audio.play();
+        setIsPlaying(true);
+        audioPlayer.play();
+      } else {
+        audio?.pause();
+        setIsPlaying(false);
+        audioPlayer.pause();
+      }
+    }
+  };
+
+  useEffect(() => {
+    setCurrentTime(0);
+    setDuration(0);
+
+    if (audioPlayerRef.current?.audio?.current) {
+      audioPlayerRef.current.audio.current.volume = volume;
+      audioPlayerRef.current.audio.current.muted = isMuted;
+    }
+    if (hasSongSource && audioPlayer.isPlaying) {
+      if (audioPlayerRef.current?.audio?.current) {
+        audioPlayerRef.current.audio.current.play().catch((err) => {
+          console.error("Error playing audio:", err);
+          setIsPlaying(false);
+          audioPlayer.pause();
+        });
+      }
+    }
+  }, [uuid, index, hasSongSource, volume, isMuted]);
+
+  useEffect(() => {
+    const syncWithAudioPlayer = () => {
+      if (audioPlayer.isPlaying && !isPlaying && hasSongSource) {
+        if (audioPlayerRef.current?.audio?.current) {
+          audioPlayerRef.current.audio.current.play().catch(() => {
+            setIsPlaying(false);
+          });
+          setIsPlaying(true);
+        }
+      } else if (!audioPlayer.isPlaying && isPlaying) {
+        if (audioPlayerRef.current?.audio?.current) {
+          audioPlayerRef.current.audio.current.pause();
+          setIsPlaying(false);
+        }
+      }
+    };
+
+    syncWithAudioPlayer();
+  }, [audioPlayer.isPlaying, hasSongSource]);
+
+  useEffect(() => {
+    const prevAudioPlayerIsPlaying = audioPlayer.isPlaying;
+
+    if (isPlaying !== prevAudioPlayerIsPlaying) {
+      if (isPlaying) {
+        audioPlayer.play();
+      } else {
+        audioPlayer.pause();
+      }
+    }
+  }, [isPlaying]);
+
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (audioPlayerRef.current && duration) {
+      const progressBar = e.currentTarget;
+      const rect = progressBar.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const progressBarWidth = rect.width;
+      const percentage = offsetX / progressBarWidth;
+      const newTime = percentage * duration;
+
+      if (audioPlayerRef.current.audio.current) {
+        audioPlayerRef.current.audio.current.currentTime = newTime;
+        setCurrentTime(newTime);
+      }
+    }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    if (newVolume >= 0 && newVolume <= 1) {
+      setVolume(newVolume);
+      if (audioPlayerRef.current?.audio?.current) {
+        audioPlayerRef.current.audio.current.volume = newVolume;
+
+        if (newVolume === 0) {
+          if (!isMuted) {
+            audioPlayerRef.current.audio.current.muted = true;
+          }
+        } else if (isMuted) {
+          audioPlayerRef.current.audio.current.muted = false;
+        }
+      }
+    }
+  };
+
+  const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="h-24 border-t border-zinc-800 flex items-center justify-around">
+    <div
+      className={`h-24 relative border-t border-zinc-800 flex items-center justify-around ${
+        !hasSongSource ? "opacity-70" : ""
+      }`}
+    >
+      <div
+        className={`w-full absolute top-0 ${
+          hasSongSource ? "cursor-pointer" : "cursor-not-allowed"
+        }`}
+        onClick={hasSongSource ? handleProgressClick : undefined}
+      >
+        <Progress value={progressPercentage} className="w-full p-0 h-1" />
+      </div>
       <CurrentSong
-        key={currentSong?.id}
-        songName={currentSong?.title || ""}
         artist={currentSong?.artist || ""}
+        songName={currentSong?.title || "No song selected"}
         cover={currentSong?.bannerSrc || ""}
-        songId={currentSong?.id || ""}
+        songId={currentSong?.id}
       />
+
       <SoundControls
-        isPlaying={isPlaying && currentSong !== undefined}
-        onPlayPause={() => (isPlaying ? pause() : play())}
-        currentTime={currentTime}
-        duration={duration}
-        onSeek={setCurrentTime}
-        isLoading={false}
-        onNext={nextSong}
-        onPrevious={previousSong}
-        disabled={!currentSong?.songURL}
-        repeat={repeat}
-        onRepeatToggle={toggleRepeat}
+        isPlaying={isPlaying}
+        repeatMode={repeatMode}
+        shuffle={shuffle}
+        onPlayPause={togglePlayPause}
+        onNext={handleClickNext}
+        onPrevious={handleClickPrevious}
+        onRepeatClick={cycleRepeatMode}
+        onShuffleClick={toggleShuffle}
+        disabled={!hasSongSource}
       />
-      <VolumeControl volume={volume} onVolumeChange={setVolume} />
+
+      <VolumeControl
+        volume={volume}
+        onVolumeChange={handleVolumeChange}
+        disabled={!hasSongSource}
+      />
+
+      <div className="hidden">
+        <AudioPlayer
+          ref={audioPlayerRef}
+          src={hasSongSource ? currentSong?.songURL : undefined}
+          showSkipControls={true}
+          showJumpControls={false}
+          onClickNext={hasSongSource ? handleClickNext : undefined}
+          onClickPrevious={hasSongSource ? handleClickPrevious : undefined}
+          onEnded={hasSongSource ? handleEnd : undefined}
+          onPlay={() => hasSongSource && setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          volume={volume}
+          autoPlayAfterSrcChange={hasSongSource}
+          loop={false}
+          muted={isMuted}
+        />
+      </div>
     </div>
   );
 }

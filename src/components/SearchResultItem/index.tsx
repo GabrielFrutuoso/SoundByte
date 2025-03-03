@@ -1,7 +1,7 @@
 import { Heart, Pause, Play } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { usePlaylistStore } from "@/store/playlistStore";
+import { usePlayerStore } from "@/store/playlistStore";
 import { SearchResultType } from "@/app/types/SearchResult.type";
 import { useUserStore } from "@/store/userStore";
 import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
@@ -25,8 +25,8 @@ export const SearchResultItem = ({
   result: SearchResultType;
   type: string;
 }) => {
-  const { setUuid, uuid } = usePlaylistStore();
-  const { play, pause, isPlaying } = useAudioPlayer();
+  const { setUuid, uuid } = usePlayerStore();
+  const audioPlayer = useAudioPlayer();
   const { mutate: likePlaylist } = useLikePlaylist();
   const { mutate: disLikePlaylist } = useDisikePlaylist();
   const { mutate: likeSong } = useLikeSongs();
@@ -86,22 +86,27 @@ export const SearchResultItem = ({
     }
   };
 
+  const isCurrentlyPlaying = audioPlayer.isPlaying && uuid === result.id;
+
   return (
     <div className="flex flex-col gap-2 w-full cursor-pointer group">
       <div className="relative w-full aspect-square">
         <div className="flex items-center justify-center bg-white/15 group-hover:visible invisible absolute w-full h-full rounded-lg z-10">
           <button
-            className={"flex justify-center items-center w-8 h-8 sm:w-10 sm:h-10 p-1 rounded-lg absolute right-2 bottom-2 bg-transparent [&_svg]:size-10 text-secondary-foreground"}
-            onClick={() => {
-              if (isPlaying && uuid === result.id) {
-                pause();
+            className={
+              "flex justify-center items-center w-8 h-8 sm:w-10 sm:h-10 p-1 rounded-lg absolute right-2 bottom-2 bg-transparent [&_svg]:size-10 text-secondary-foreground"
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isCurrentlyPlaying) {
+                audioPlayer.pause();
               } else {
                 handleSongSelect(result.id);
-                play();
+                audioPlayer.play();
               }
             }}
           >
-            {isPlaying && uuid === result.id ? <Pause /> : <Play />}
+            {isCurrentlyPlaying ? <Pause /> : <Play />}
           </button>
           <button
             className={`flex justify-center items-center w-16 h-16 sm:w-10 sm:h-10 p-1 rounded-lg bg-transparent [&_svg]:size-20 ${
