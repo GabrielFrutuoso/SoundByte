@@ -64,53 +64,55 @@ export const PlaylistItem = ({
 
   return (
     <ContextMenu>
-      <ContextMenuTrigger>
-        <div
-          className={baseStyle({
-            variant,
-            className: uuid === id ? "text-lime-500" : "",
-          })}
-        >
-          <div className="relative group">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (isPlaying) {
-                  audioPlayer.pause();
-                } else {
-                  handlePlaylistSelect();
-                  audioPlayer.play();
-                }
-              }}
-              className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg"
-            >
-              {isPlaying ? <Pause /> : <Play />}
-            </button>
-            <Image
-              className={`${
-                isInMenu && "w-20"
-              } rounded-lg aspect-square object-cover`}
-              draggable={false}
-              src={bannerSrc}
-              width={50}
-              height={50}
-              alt="Album cover"
-            />
-          </div>
-          {!isCollapsed && (
-            <Link className="w-full" href={`/playlist?id=${id}`}>
-              <div
-                title={title}
-                className={`flex flex-col ${
-                  isInMenu && "text-lg font-bold"
-                } text-ellipsis overflow-hidden whitespace-nowrap`}
-              >
-                <h1>{title}</h1>
-              </div>
-            </Link>
-          )}
+      <div
+        className={baseStyle({
+          variant,
+          className: uuid === id ? "text-lime-500" : "",
+        })}
+      >
+        <div className="relative group">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isPlaying) {
+                audioPlayer.pause();
+              } else {
+                handlePlaylistSelect();
+                audioPlayer.play();
+              }
+            }}
+            className="flex items-center justify-center bg-white/25 group-hover:visible invisible absolute w-full h-full rounded-lg"
+          >
+            {isPlaying ? <Pause /> : <Play />}
+          </button>
+          <Image
+            className={`${
+              isInMenu && "w-20"
+            } rounded-lg aspect-square object-cover`}
+            draggable={false}
+            src={bannerSrc}
+            width={50}
+            height={50}
+            alt="Album cover"
+          />
         </div>
-      </ContextMenuTrigger>
+        {!isCollapsed && (
+          <Link
+            className="w-full h-full flex items-center"
+            href={`/playlist?id=${id}`}
+          >
+            <ContextMenuTrigger
+              title={title}
+              className={`flex items-center h-full w-full ${
+                isInMenu && "text-lg font-bold"
+              } text-ellipsis overflow-hidden whitespace-nowrap`}
+            >
+              <h1>{title}</h1>
+            </ContextMenuTrigger>
+          </Link>
+        )}
+      </div>
+
       <ContextMenuContent>
         <ContextMenuItem
           onClick={() => {
