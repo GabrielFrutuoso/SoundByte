@@ -10,13 +10,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetPlaylistById } from "@/hooks/requests/playlist/useGetPlaylistById";
-import { Ellipsis, Heart, Music, Pause, Play } from "lucide-react";
+import { Heart, Music, Pause, Play, Share2 } from "lucide-react";
 import Image from "next/image";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { usePlayerStore } from "@/store/playlistStore";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { PlaylistItemSkeleton, PlaylistSkeleton } from "./Skeleton";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
+import { useUserStore } from "@/store/userStore";
+import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
+import { useGetLikedPlaylists } from "@/hooks/requests/likedPlaylist/useGetLikedPlaylists";
+import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist";
 
 export default function Playlist() {
   const searchParams = useSearchParams();
@@ -25,6 +31,18 @@ export default function Playlist() {
 
   const { setUuid, setIndex, uuid, index } = usePlayerStore();
   const audioPlayer = useAudioPlayer();
+  const { user } = useUserStore();
+  const { mutate: likePlaylist } = useLikePlaylist();
+  const { mutate: dislikePlaylist } = useDisikePlaylist();
+  const { data: likedPlaylists } = useGetLikedPlaylists(user?.id || "");
+  const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    const liked = likedPlaylists?.find(
+      (likedPlaylist) => likedPlaylist.playlist.id === id
+    );
+    setIsLiked(!!liked);
+  }, [likedPlaylists, id]);
 
   const isCurrentPlaylist = useMemo(() => uuid === id, [uuid, id]);
 
@@ -60,20 +78,52 @@ export default function Playlist() {
   const getPlayButton = () => {
     if (isCurrentPlaylist && isPlaying) {
       return (
-        <Pause
-          size={40}
-          className="cursor-pointer hover:text-lime-500"
+        <Button
+          title="Parar"
           onClick={handlePlayPlaylist}
-        />
+          variant="ghost"
+          size={"icon"}
+          className="[&_svg]:size-8"
+        >
+          <Pause className="cursor-pointer hover:text-lime-500" />
+        </Button>
       );
     } else {
       return (
-        <Play
-          size={40}
-          className="cursor-pointer hover:text-lime-500"
+        <Button
+          title="Tocar"
           onClick={handlePlayPlaylist}
-        />
+          variant="ghost"
+          size={"icon"}
+          className="[&_svg]:size-8"
+        >
+          <Play size={40} className="cursor-pointer hover:text-lime-500" />
+        </Button>
       );
+    }
+  };
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user?.id || !id) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para curtir playlists",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isLiked) {
+      dislikePlaylist({
+        userId: user.id,
+        playlistId: id,
+      });
+    } else {
+      likePlaylist({
+        userId: user.id,
+        playlistId: id,
+      });
     }
   };
 
@@ -100,10 +150,37 @@ export default function Playlist() {
                 {playlist?.user?.username}
               </h2>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               {getPlayButton()}
-              <Heart className="text-lime-500" size={40} />
-              <Ellipsis size={40} />
+              <Button
+                variant="ghost"
+                size={"icon"}
+                className="[&_svg]:size-8"
+                onClick={handleLike}
+              >
+                <Heart
+                  className={isLiked ? "text-lime-500" : ""}
+                  fill={isLiked ? "currentColor" : "none"}
+                />
+              </Button>
+              <Button
+                title="Compartilhar"
+                variant="ghost"
+                size={"icon"}
+                className="[&_svg]:size-8"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${window.location.origin}/playlist/${playlist?.id}`
+                  );
+                  toast({
+                    title: "Link copiado!",
+                    description: "Use o link para compartilhar a playlist",
+                    variant: "default",
+                  });
+                }}
+              >
+                <Share2 />
+              </Button>
             </div>
           </div>
         </div>
