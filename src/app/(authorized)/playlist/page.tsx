@@ -1,28 +1,46 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-} from "@/components/ui/table";
 import { useGetPlaylistById } from "@/hooks/requests/playlist/useGetPlaylistById";
-import { Heart, Music, Pause, Play, Share2 } from "lucide-react";
+import { Heart, Music, Play, Share2, Plus } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { usePlayerStore } from "@/store/playlistStore";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
-import { PlaylistItemSkeleton, PlaylistSkeleton } from "./Skeleton";
+import { PlaylistSkeleton } from "./Skeleton";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useUserStore } from "@/store/userStore";
 import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
 import { useGetLikedPlaylists } from "@/hooks/requests/likedPlaylist/useGetLikedPlaylists";
 import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist";
+import { useRemoveSongFromPlaylist } from "@/hooks/requests/playlist/useRemoveSongFromPlaylist";
+import { useGetSongs } from "@/hooks/requests/song/useGetSongs";
+import { AddSongToPlaylistDialog } from "@/components/AddSongToPlaylistDialog";
+import { PlaylistTable } from "@/components/PlaylistTable";
+
+interface Song {
+  id: string;
+  title: string;
+  artist: string;
+  bannerSrc: string;
+  songURL: string;
+  isPrivate: boolean;
+  createdAt: string;
+  updatedAt: string;
+  userUUID: string;
+  genreId: number;
+  user?: {
+    username: string;
+  };
+}
+
+interface LikedPlaylist {
+  playlist: {
+    id: string;
+  };
+}
 
 export default function Playlist() {
   const searchParams = useSearchParams();
@@ -36,10 +54,12 @@ export default function Playlist() {
   const { mutate: dislikePlaylist } = useDisikePlaylist();
   const { data: likedPlaylists } = useGetLikedPlaylists(user?.id || "");
   const [isLiked, setIsLiked] = useState(false);
+  const { mutate: removeSongFromPlaylist } = useRemoveSongFromPlaylist();
+  const { data: songsResponse } = useGetSongs("", "", 100);
 
   useEffect(() => {
     const liked = likedPlaylists?.find(
-      (likedPlaylist) => likedPlaylist.playlist.id === id
+      (likedPlaylist: LikedPlaylist) => likedPlaylist.playlist.id === id
     );
     setIsLiked(!!liked);
   }, [likedPlaylists, id]);
@@ -59,49 +79,6 @@ export default function Playlist() {
       audioPlayer.play();
     }
   }, [id, setUuid, setIndex, audioPlayer, isCurrentPlaylist, isPlaying]);
-
-  const handlePlaySong = useCallback(
-    (songIndex: number) => {
-      if (isCurrentPlaylist && index === songIndex && isPlaying) {
-        audioPlayer.pause();
-      } else if (isCurrentPlaylist && index === songIndex && !isPlaying) {
-        audioPlayer.play();
-      } else {
-        setUuid(id as string);
-        setIndex(songIndex);
-        audioPlayer.play();
-      }
-    },
-    [id, setUuid, setIndex, audioPlayer, isCurrentPlaylist, index, isPlaying]
-  );
-
-  const getPlayButton = () => {
-    if (isCurrentPlaylist && isPlaying) {
-      return (
-        <Button
-          title="Parar"
-          onClick={handlePlayPlaylist}
-          variant="ghost"
-          size={"icon"}
-          className="[&_svg]:size-8"
-        >
-          <Pause className="cursor-pointer hover:text-lime-500" />
-        </Button>
-      );
-    } else {
-      return (
-        <Button
-          title="Tocar"
-          onClick={handlePlayPlaylist}
-          variant="ghost"
-          size={"icon"}
-          className="[&_svg]:size-8"
-        >
-          <Play size={40} className="cursor-pointer hover:text-lime-500" />
-        </Button>
-      );
-    }
-  };
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -127,6 +104,32 @@ export default function Playlist() {
     }
   };
 
+  const isPlaylistOwner = useMemo(() => {
+    return playlist?.userId === user?.id;
+  }, [playlist, user]);
+
+  const handleRemoveSongFromPlaylist = (
+    e: React.MouseEvent,
+    songId: string
+  ) => {
+    e.stopPropagation();
+    if (!id) return;
+
+    removeSongFromPlaylist({
+      playlistId: id,
+      songId: songId,
+    });
+  };
+
+  const availableSongs = useMemo(() => {
+    const songs = songsResponse?.data || [];
+
+    if (!songs.length || !playlist?.songs) return [];
+
+    const playlistSongIds = playlist.songs.map((ps) => ps.song?.id);
+    return songs.filter((song: Song) => !playlistSongIds.includes(song.id));
+  }, [songsResponse, playlist]);
+
   return (
     <div className="h-full flex flex-col px-12 pt-12 space-y-4">
       {isLoading ? (
@@ -151,7 +154,15 @@ export default function Playlist() {
               </h2>
             </div>
             <div className="flex gap-2">
-              {getPlayButton()}
+              <Button
+                title="Tocar"
+                onClick={handlePlayPlaylist}
+                variant="ghost"
+                size={"icon"}
+                className="[&_svg]:size-8"
+              >
+                <Play size={40} className="cursor-pointer hover:text-lime-500" />
+              </Button>
               <Button
                 variant="ghost"
                 size={"icon"}
@@ -188,54 +199,49 @@ export default function Playlist() {
 
       <Separator orientation="horizontal" />
       {!isLoading && (playlist?.songs?.length ?? 0) > 0 ? (
-        <Table>
-          <TableHeader className="sticky top-0 bg-zinc-950">
-            <TableRow>
-              <TableHead></TableHead>
-              <TableHead>Nome da musica</TableHead>
-              <TableHead>Artista/Banda</TableHead>
-              <TableHead>Adicionado por</TableHead>
-              <TableHead>Adicionado em</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <PlaylistItemSkeleton />
-            ) : (
-              playlist?.songs.map((song, songIndex) => (
-                <TableRow
-                  key={song?.song?.id}
-                  className={`text-lg font-thin cursor-pointer ${
-                    isCurrentPlaylist && index === songIndex
-                      ? "text-lime-500"
-                      : ""
-                  }`}
-                  onClick={() => handlePlaySong(songIndex)}
-                >
-                  <TableCell>
-                    <div className="flex items-center">
-                      {isCurrentPlaylist && index === songIndex && isPlaying ? (
-                        <Pause size={16} className="text-lime-500" />
-                      ) : (
-                        <span className="text-lg px-1">{songIndex + 1}</span>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>{song?.song?.title}</TableCell>
-                  <TableCell>{song?.song?.artist}</TableCell>
-                  <TableCell>{song?.song?.user?.username}</TableCell>
-                  <TableCell>
-                    {new Date(song?.song?.createdAt).toLocaleDateString()}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        <PlaylistTable
+          songs={playlist?.songs || []}
+          isOwner={isPlaylistOwner}
+          playlistId={id as string}
+          availableSongs={availableSongs}
+          isCurrentPlaylist={isCurrentPlaylist}
+          currentSongIndex={index || 0}
+          isPlaying={audioPlayer.isPlaying}
+          onRowClick={(songIndex) => {
+            if (isCurrentPlaylist) {
+              if (songIndex === index && audioPlayer.isPlaying) {
+                audioPlayer.pause();
+              } else {
+                setIndex(songIndex);
+                audioPlayer.play();
+              }
+            } else {
+              setIndex(songIndex);
+              setUuid(id as string);
+              audioPlayer.play();
+            }
+          }}
+          onRemoveSong={handleRemoveSongFromPlaylist}
+        />
       ) : (
         <div className="flex flex-col items-center justify-center h-full text-zinc-600">
           <Music size={100} />
           <p className="text-2xl font-bold">Nenhuma música nesta playlist</p>
+          {isPlaylistOwner && (
+            <AddSongToPlaylistDialog
+              playlistId={id as string}
+              availableSongs={availableSongs}
+              trigger={
+                <Button
+                  title="Adicionar música"
+                  variant="link"
+                  className="gap-2"
+                >
+                  <Plus size={16} /> Adicionar música
+                </Button>
+              }
+            />
+          )}
         </div>
       )}
     </div>
