@@ -1,5 +1,6 @@
 import { Heart, Pause, Play } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { usePlayerStore } from "@/store/playlistStore";
 import { SearchResultType } from "@/app/types/SearchResult.type";
@@ -132,17 +133,34 @@ export const SearchResultItem = ({
         />
       </div>
 
-      <div className={`w-full ${uuid === result.id ? "text-lime-500" : ""}`}>
-        <p
-          title={result?.title}
-          className="text-base sm:text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap"
+      {type === "playlist" ? (
+        <Link 
+          href={`/playlist?id=${result.id}`}
+          className={`w-full ${uuid === result.id ? "text-lime-500" : ""}`}
         >
-          {result?.title}
-        </p>
-        <p className="text-xs sm:text-sm font-thin opacity-75 text-ellipsis overflow-hidden whitespace-nowrap">
-          {result?.artist}
-        </p>
-      </div>
+          <p
+            title={result?.title}
+            className="text-base sm:text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap"
+          >
+            {result?.title}
+          </p>
+          <p className="text-xs sm:text-sm font-thin opacity-75 text-ellipsis overflow-hidden whitespace-nowrap">
+            {result?.artist}
+          </p>
+        </Link>
+      ) : (
+        <div className={`w-full ${uuid === result.id ? "text-lime-500" : ""}`}>
+          <p
+            title={result?.title}
+            className="text-base sm:text-lg font-bold text-ellipsis overflow-hidden whitespace-nowrap"
+          >
+            {result?.title}
+          </p>
+          <p className="text-xs sm:text-sm font-thin opacity-75 text-ellipsis overflow-hidden whitespace-nowrap">
+            {result?.artist}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
