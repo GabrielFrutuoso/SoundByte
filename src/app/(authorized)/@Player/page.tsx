@@ -12,9 +12,10 @@ import { CurrentSong } from "@/components/CurrentSong";
 import { VolumeControl } from "@/components/VolumeControl";
 import { usePlayerStore } from "@/store/playlistStore";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { useHotkeys } from 'react-hotkeys-hook';
 
 export default function Player() {
-  const { uuid, index, setMaxIndex, volume, setVolume, isMuted } =
+  const { uuid, index, setMaxIndex, volume, setVolume, isMuted, setMuted } =
     usePlayerStore();
   const { data } = useGetToListen(uuid);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -202,6 +203,13 @@ export default function Player() {
   };
 
   const progressPercentage = duration ? (currentTime / duration) * 100 : 0;
+
+  useHotkeys('space', () => togglePlayPause());
+  useHotkeys('right', () => handleClickNext());
+  useHotkeys('left', () => handleClickPrevious());
+  useHotkeys('s', () => toggleShuffle());
+  useHotkeys('r', () => cycleRepeatMode());
+  useHotkeys('m', () => setMuted(!isMuted));
 
   return (
     <div
