@@ -1,5 +1,5 @@
 import { SongItemProps } from "@/app/types/SongProps.type";
-import { Pause, Play } from "lucide-react";
+import { Pause, Play, FolderPlus } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { usePlayerStore } from "@/store/playlistStore";
@@ -9,11 +9,16 @@ import {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
 } from "../ui/context-menu";
 import { useUserStore } from "@/store/userStore";
 import { useDisikeSongs } from "@/hooks/requests/song/useDislikeSong";
 import { useLikeSongs } from "@/hooks/requests/song/useLikeSong";
 import { useGetLikedSongs } from "@/hooks/requests/likedSong/useGetLikedSongs";
+import { useAddSongToPlaylist } from "@/hooks/requests/playlist/useAddSongToPlaylist";
+import { useGetPlaylistsByUser } from "@/hooks/requests/playlist/useGetPlaylistsByUser/route";
 
 interface LikedSong {
   song: {
@@ -29,8 +34,10 @@ export const SongItem = ({ id, bannerSrc, title, artist }: SongItemProps) => {
   const [isLiked, setIsLiked] = useState(false);
 
   const { data: likedSongs } = useGetLikedSongs(currentUser?.id || "");
+  const { data: userPlaylists } = useGetPlaylistsByUser(currentUser?.id || "");
   const { mutate: likeSong } = useLikeSongs();
   const { mutate: dislikeSong } = useDisikeSongs();
+  const { mutate: addSongToPlaylist } = useAddSongToPlaylist();
 
   useEffect(() => {
     if (likedSongs) {
@@ -54,6 +61,10 @@ export const SongItem = ({ id, bannerSrc, title, artist }: SongItemProps) => {
     } else {
       likeSong({ songId: id, userId: currentUser.id });
     }
+  };
+
+  const handleAddToPlaylist = (playlistId: string) => {
+    addSongToPlaylist({ playlistId, songId: id });
   };
 
   return (
@@ -111,6 +122,31 @@ export const SongItem = ({ id, bannerSrc, title, artist }: SongItemProps) => {
         <ContextMenuItem onClick={handleLike}>
           {isLiked ? "Descurtir :(" : "Curtir <3"}
         </ContextMenuItem>
+
+        <ContextMenuSub>
+          <ContextMenuSubTrigger>
+            <div className="flex items-center gap-2">
+              <FolderPlus className="h-4 w-4" />
+              <span>Adicionar à playlist</span>
+            </div>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent className="max-h-60 overflow-y-auto">
+            {userPlaylists && userPlaylists.length > 0 ? (
+              userPlaylists.map((playlist) => (
+                <ContextMenuItem
+                  key={playlist.id}
+                  onClick={() => handleAddToPlaylist(playlist.id)}
+                >
+                  {playlist.title}
+                </ContextMenuItem>
+              ))
+            ) : (
+              <ContextMenuItem disabled>
+                Nenhuma playlist encontrada
+              </ContextMenuItem>
+            )}
+          </ContextMenuSubContent>
+        </ContextMenuSub>
       </ContextMenuContent>
     </ContextMenu>
   );
