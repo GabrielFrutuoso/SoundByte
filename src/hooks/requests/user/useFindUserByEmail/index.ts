@@ -1,6 +1,8 @@
+import { toast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 
 export type User = {
+  provider: string;
   id: string;
   username: string;
   email: string;
@@ -26,7 +28,11 @@ const fetchUserByEmail = async (email: string): Promise<User | null> => {
   const response = await fetch(`http://localhost:3000/api/user?email=${email}`);
 
   if (!response.ok && response.status !== 404) {
-    throw new Error('Failed to fetch user');
+    toast({
+      title: "Erro",
+      description: "Erro ao buscar usuário",
+      variant: "destructive",
+    });
   }
 
   if (response.status === 404) {
