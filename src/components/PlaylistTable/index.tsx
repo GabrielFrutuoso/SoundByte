@@ -8,8 +8,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Pause, Plus, X, Play } from "lucide-react";
+import { Pause, Plus, Play, Trash } from "lucide-react";
 import { AddSongToPlaylistDialog } from "@/components/AddSongToPlaylistDialog";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 interface Song {
   id: string;
@@ -93,100 +99,96 @@ export const PlaylistTable = ({
       </TableHeader>
       <TableBody>
         {songs.map((song, index) => (
-          <TableRow
-            key={song.id}
-            className={`cursor-pointer ${
-              isCurrentPlaylist && index === currentSongIndex
-                ? isPlaying
-                  ? "bg-zinc-800/80 hover:bg-zinc-700/80"
-                  : "bg-zinc-800/40 hover:bg-zinc-700/40"
-                : "hover:bg-zinc-900"
-            }`}
-            onClick={() => onRowClick(index)}
-          >
-            <TableCell className="text-center">
-              {isCurrentPlaylist && index === currentSongIndex ? (
-                <div className="flex justify-center">
-                  {isPlaying ? (
-                    <Pause size={16} className="text-lime-500" />
+          <ContextMenu key={song.id}>
+            <ContextMenuTrigger asChild>
+              <TableRow
+                className={`cursor-pointer ${
+                  isCurrentPlaylist && index === currentSongIndex
+                    ? isPlaying
+                      ? "bg-zinc-800/80 hover:bg-zinc-700/80"
+                      : "bg-zinc-800/40 hover:bg-zinc-700/40"
+                    : "hover:bg-zinc-900"
+                }`}
+                onClick={() => onRowClick(index)}
+              >
+                <TableCell className="text-center">
+                  {isCurrentPlaylist && index === currentSongIndex ? (
+                    <div className="flex justify-center">
+                      {isPlaying ? (
+                        <Pause size={16} className="text-lime-500" />
+                      ) : (
+                        <Play size={16} className="text-lime-500" />
+                      )}
+                    </div>
                   ) : (
-                    <Play size={16} className="text-lime-500" />
+                    index + 1
                   )}
-                </div>
-              ) : (
-                index + 1
-              )}
-            </TableCell>
-            <TableCell>
-              <div className="">
-                <span
-                  className={`line-clamp-1 ${
-                    isCurrentPlaylist && index === currentSongIndex
-                      ? isPlaying
-                        ? "text-lime-500 font-medium"
-                        : "text-lime-500 font-medium"
+                </TableCell>
+                <TableCell>
+                  <div className="">
+                    <span
+                      className={`line-clamp-1 ${
+                        isCurrentPlaylist && index === currentSongIndex
+                          ? isPlaying
+                            ? "text-lime-500 font-medium"
+                            : "text-lime-500 font-medium"
+                          : ""
+                      }`}
+                    >
+                      {song.song?.title}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell
+                  className={`${
+                    isCurrentPlaylist && index === currentSongIndex && isPlaying
+                      ? "text-lime-500"
+                      : isCurrentPlaylist && index === currentSongIndex
+                      ? "text-lime-500"
                       : ""
                   }`}
                 >
-                  {song.song?.title}
-                </span>
-              </div>
-            </TableCell>
-            <TableCell
-              className={`${
-                isCurrentPlaylist && index === currentSongIndex && isPlaying
-                  ? "text-lime-500"
-                  : isCurrentPlaylist && index === currentSongIndex
-                  ? "text-lime-500"
-                  : ""
-              }`}
-            >
-              {song.song?.artist}
-            </TableCell>
-            <TableCell
-              className={`${
-                isCurrentPlaylist && index === currentSongIndex && isPlaying
-                  ? "text-lime-500"
-                  : isCurrentPlaylist && index === currentSongIndex
-                  ? "text-lime-500"
-                  : ""
-              }`}
-            >
-              Você
-            </TableCell>
-            <TableCell
-              className={`${
-                isCurrentPlaylist && index === currentSongIndex && isPlaying
-                  ? "text-lime-500"
-                  : isCurrentPlaylist && index === currentSongIndex
-                  ? "text-lime-500"
-                  : ""
-              }`}
-            >
-              {song.song?.createdAt
-                ? new Date(song.song.createdAt).toLocaleDateString()
-                : ""}
-            </TableCell>
-            {isOwner && (
-              <TableCell className="text-center">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) =>
-                    song.song?.id && onRemoveSong(e, song.song.id)
-                  }
-                  title="Remover da playlist"
-                  className={
-                    isCurrentPlaylist && index === currentSongIndex
-                      ? "hover:bg-zinc-700"
+                  {song.song?.artist}
+                </TableCell>
+                <TableCell
+                  className={`${
+                    isCurrentPlaylist && index === currentSongIndex && isPlaying
+                      ? "text-lime-500"
+                      : isCurrentPlaylist && index === currentSongIndex
+                      ? "text-lime-500"
                       : ""
-                  }
+                  }`}
                 >
-                  <X className="text-red-500" size={16} />
-                </Button>
-              </TableCell>
+                  Você
+                </TableCell>
+                <TableCell
+                  className={`${
+                    isCurrentPlaylist && index === currentSongIndex && isPlaying
+                      ? "text-lime-500"
+                      : isCurrentPlaylist && index === currentSongIndex
+                      ? "text-lime-500"
+                      : ""
+                  }`}
+                >
+                  {song.song?.createdAt
+                    ? new Date(song.song.createdAt).toLocaleDateString()
+                    : ""}
+                </TableCell>
+                {isOwner && <TableCell className="text-center"></TableCell>}
+              </TableRow>
+            </ContextMenuTrigger>
+            {isOwner && (
+              <ContextMenuContent>
+                <ContextMenuItem
+                  className="text-red-500 focus:text-red-500 focus:bg-red-50/10"
+                  onClick={(e) => song.song?.id && onRemoveSong(e, song.song.id)}
+                >
+                  <Trash className="mr-2 h-4 w-4" />
+                  Remover da playlist
+                </ContextMenuItem>
+              </ContextMenuContent>
             )}
-          </TableRow>
+          </ContextMenu>
         ))}
       </TableBody>
     </Table>
