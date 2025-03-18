@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Pencil, Music, ListMusic, Upload } from "lucide-react";
+import { Music, ListMusic, Upload } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useUserStore } from "@/store/userStore";
 import React from "react";
@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlaylistItem } from "@/components/PlaylistItem";
 import { SongItem } from "@/components/SongItem";
 import { PlaylistItemSkeleton } from "@/components/PlaylistItem/Skeleton";
+import { EditProfileDialog } from "@/components/EditProfileDialog";
 
 export default function Settings() {
   const { user } = useUserStore();
@@ -42,9 +43,7 @@ export default function Settings() {
             <h3 className="text-4xl font-bold">{user?.username}</h3>
             <p className="text-lg">{user?.email}</p>
             <div className="flex items-center justify-start gap-2">
-              <Button variant="outline">
-                <Pencil className="mr-2" /> Edit profile
-              </Button>
+              <EditProfileDialog />
               {user.provider === "credentials" && (
                 <Button variant="destructive">Change password</Button>
               )}
