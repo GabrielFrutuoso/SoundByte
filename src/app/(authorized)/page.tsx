@@ -28,6 +28,7 @@ export default function Home() {
         avatar: data.avatar || "",
         likedPlaylists: data.likedPlaylists || [],
         likedSongs: data.likedSongs || [],
+        provider: data.provider || "",
       };
       setUser(userWithRequiredFields);
     }

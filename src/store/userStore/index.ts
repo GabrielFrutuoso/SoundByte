@@ -5,6 +5,7 @@ export type User = {
   username: string;
   email: string;
   avatar: string;
+  provider: string;
   createdAt?: string;
   updatedAt?: string;
   likedPlaylists: Array<{
