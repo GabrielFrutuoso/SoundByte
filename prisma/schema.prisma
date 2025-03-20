@@ -47,7 +47,7 @@ model Song {
 }
 
 model Playlist {
-  id          String          @id @default(uuid())
+  id          String          @id @default(uuid()) 
   title       String
   bannerSrc   String          @map("banner_src")
   isPrivate   Boolean         @map("is_private")
@@ -59,6 +59,7 @@ model Playlist {
   songs       PlaylistSong[]
 
   @@map("playlists")
+
 }
 
 model LikedSong {
@@ -66,7 +67,7 @@ model LikedSong {
   userId String @map("user_id")
   songId String @map("song_id")
   user   User   @relation(fields: [userId], references: [id])
-  song   Song   @relation(fields: [songId], references: [id])
+  song   Song   @relation(fields: [songId], references: [id], onDelete: Cascade)
 
   @@map("liked_songs")
 }
@@ -76,7 +77,7 @@ model LikedPlaylist {
   userId     String   @map("user_id")
   playlistId String   @map("playlist_id")
   user       User     @relation(fields: [userId], references: [id])
-  playlist   Playlist @relation(fields: [playlistId], references: [id])
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
 
   @@map("liked_playlists")
 }
@@ -85,8 +86,8 @@ model PlaylistSong {
   id         String   @id @default(uuid())
   songId     String   @map("song_id")
   playlistId String   @map("playlist_id")
-  song       Song     @relation(fields: [songId], references: [id])
-  playlist   Playlist @relation(fields: [playlistId], references: [id])
+  song       Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
 
   @@map("playlist_songs")
 }
