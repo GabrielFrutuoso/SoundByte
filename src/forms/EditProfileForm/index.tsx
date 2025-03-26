@@ -22,7 +22,7 @@ export const EditProfileForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col items-center gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col justify-between h-full bg-slate-200">
       <FormField>
         <Label htmlFor="username">username</Label>
         <Input
@@ -33,11 +33,10 @@ export const EditProfileForm = () => {
           id="username"
         />
       </FormField>
-      <DialogFooter className="w-full">
         <Button className="w-full" type="submit">
           <Pencil /> Salvar
         </Button>
-      </DialogFooter>
+
     </form>
   );
 };

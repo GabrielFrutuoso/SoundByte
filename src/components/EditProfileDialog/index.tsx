@@ -20,7 +20,7 @@ export const EditProfileDialog = () => {
           <Pencil className="mr-2" /> Edit profile
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="h-[250px]">
         <DialogHeader>
           <DialogTitle>Edit profile</DialogTitle>
         </DialogHeader>
