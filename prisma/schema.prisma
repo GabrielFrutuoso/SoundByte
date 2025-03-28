@@ -38,7 +38,7 @@ model Song {
   updatedAt DateTime       @updatedAt @map("updated_at")
   userUUID  String         @map("user_UUID")
   genreId   Int            @map("genre_id")
-  user      User           @relation(fields: [userUUID], references: [id])
+  user      User           @relation(fields: [userUUID], references: [id], onDelete: Cascade)
   genre     Genre          @relation(fields: [genreId], references: [id])
   likedBy   LikedSong[]
   playlists PlaylistSong[]
