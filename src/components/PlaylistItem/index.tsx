@@ -17,12 +17,14 @@ import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist"
 import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { usePlayerStore } from "@/store/playlistStore";
+import { useDeletePlaylist } from "@/hooks/requests/playlist/useDeletePlailist";
 
 export interface PlaylistItemProps {
   id: string;
   title: string;
   bannerSrc: string;
   isPrivate: boolean;
+  userId?: string;
   variant?: string;
   isInMenu?: boolean;
   songIndex: number;
@@ -33,6 +35,7 @@ export const PlaylistItem = ({
   id,
   title,
   bannerSrc,
+  userId,
   variant,
   isInMenu,
   isCollapsed,
@@ -48,6 +51,7 @@ export const PlaylistItem = ({
 
   const { mutate: likePlaylist } = useLikePlaylist();
   const { mutate: disLikePlaylist } = useDisikePlaylist();
+  const { mutate: deletePlaylist } = useDeletePlaylist();
 
   const handleLike = async () => {
     const likedPlaylists = currentUser?.likedPlaylists;
@@ -126,6 +130,13 @@ export const PlaylistItem = ({
         >
           Compartilhar
         </ContextMenuItem>
+        {currentUser?.id === userId && (
+          <ContextMenuItem onClick={() => deletePlaylist(id)}>
+            <div className="flex items-center gap-2">
+              <span>Excluir playlist</span>
+            </div>
+          </ContextMenuItem>
+        )}
         <ContextMenuItem onClick={handleLike}>
           {currentUser?.likedPlaylists?.some(
             (likedPlaylist) => likedPlaylist.playlist.id === id
