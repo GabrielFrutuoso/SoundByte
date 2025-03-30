@@ -15,25 +15,16 @@ import { PlaylistItem } from "@/components/PlaylistItem";
 import { SongItem } from "@/components/SongItem";
 import { PlaylistItemSkeleton } from "@/components/PlaylistItem/Skeleton";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
-import { useGetLikedSongs } from "@/hooks/requests/likedSong/useGetLikedSongs";
-import { SongItemProps } from "@/app/types/SongProps.type";
 
 export default function Settings() {
   const { user } = useUserStore();
-  const { data: playlists, isLoading: isLoadingPlaylists } =
-    useGetPlaylistsByUser(user?.id || "");
-  const { data: songs, isLoading: isLoadingSongs } = useGetSongsByUser(
-    user?.id || ""
-  );
-  const { data: likedSongs } = useGetLikedSongs(
-    user?.id || ""
-  );
+  const { data: playlists, isLoading: isLoadingPlaylists } = useGetPlaylistsByUser(user?.id || "");
+  const { data: songs, isLoading: isLoadingSongs } = useGetSongsByUser(user?.id || "");
 
   if (!user) {
     return redirect("/");
   }
 
-  console.log("likedSongs", likedSongs);
   return (
     <ScrollArea className="h-full w-full p-6">
       <div className="h-full flex flex-col">
@@ -121,10 +112,7 @@ export default function Settings() {
               {isLoadingSongs ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {Array.from({ length: 4 }).map((_, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col gap-2 p-4 rounded-md bg-zinc-900/50"
-                    >
+                    <div key={index} className="flex flex-col gap-2 p-4 rounded-md bg-zinc-900/50">
                       <div className="w-full aspect-square bg-zinc-800 rounded-md animate-pulse" />
                       <div className="h-4 w-3/4 bg-zinc-800 rounded animate-pulse" />
                       <div className="h-3 w-1/2 bg-zinc-800 rounded animate-pulse" />
@@ -132,45 +120,13 @@ export default function Settings() {
                   ))}
                 </div>
               ) : songs && songs.length > 0 ? (
-                <div className="flex flex-col gap-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                    {songs.map((song) => (
-                      <SongItem
-                        key={song.id}
-                        id={song.id}
-                        title={song.title}
-                        artist={song.artist}
-                        bannerSrc={song.bannerSrc}
-                        songURL={song.songURL}
-                        isPrivate={song.isPrivate}
-                        createdAt={song.createdAt}
-                        updatedAt={song.updatedAt}
-                        userUUID={song.userUUID}
-                        genreId={song.genreId}
-                      />
-                    ))}
-                  </div>
-                  <Separator className="my-6" orientation="horizontal" />
-                  <div className="flex flex-col gap-4">
-                    <h2 className="text-xl font-bold">Liked Songs</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                      {likedSongs?.map(({song}: {song: SongItemProps}) => (
-                        <SongItem
-                          key={song.id}
-                          id={song.id}
-                          title={song.title}
-                          artist={song.artist}
-                          bannerSrc={song.bannerSrc}
-                          songURL={song.songURL}
-                          isPrivate={song.isPrivate}
-                          createdAt={song.createdAt}
-                          updatedAt={song.updatedAt}
-                          userUUID={song.userUUID}
-                          genreId={song.genreId}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {songs.map((song) => (
+                    <SongItem
+                      key={song.id}
+                      {...song}
+                    />
+                  ))}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center p-8 border-zinc-700 rounded-lg">
