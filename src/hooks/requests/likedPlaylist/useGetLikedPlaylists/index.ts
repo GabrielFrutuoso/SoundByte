@@ -7,6 +7,7 @@ interface PlaylistResponse {
     title: string;
     bannerSrc: string;
     user: {
+      id: string | undefined;
       username: string;
     };
   };
