@@ -24,7 +24,10 @@ export interface PlaylistItemProps {
   title: string;
   bannerSrc: string;
   isPrivate: boolean;
-  userId?: string;
+  user?: {
+    id: string | undefined;
+    username: string;
+  }
   variant?: string;
   isInMenu?: boolean;
   songIndex: number;
@@ -35,7 +38,7 @@ export const PlaylistItem = ({
   id,
   title,
   bannerSrc,
-  userId,
+  user,
   variant,
   isInMenu,
   isCollapsed,
@@ -130,7 +133,7 @@ export const PlaylistItem = ({
         >
           Compartilhar
         </ContextMenuItem>
-        {currentUser?.id === userId && (
+        {currentUser?.id === user?.id && (
           <ContextMenuItem onClick={() => deletePlaylist(id)}>
             <div className="flex items-center gap-2">
               <span>Excluir playlist</span>
