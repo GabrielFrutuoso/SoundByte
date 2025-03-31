@@ -44,6 +44,7 @@ export default function Home() {
                 <PlaylistItem
                   key={playlist.id}
                   {...playlist}
+                  user={playlist.user || undefined}
                   isPrivate={false}
                   isInMenu={true}
                   variant="menu"
