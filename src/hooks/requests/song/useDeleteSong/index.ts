@@ -12,6 +12,7 @@ export const useDeleteSongs = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["songs"] });
+      queryClient.invalidateQueries({ queryKey: ["likedSongs"] });
       toast({
         title: "Sucesso",
         description: "A música foi excluida",
