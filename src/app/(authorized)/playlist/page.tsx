@@ -158,27 +158,19 @@ export default function Playlist() {
                 title="Tocar"
                 onClick={handlePlayPlaylist}
                 variant="ghost"
-                size={"icon"}
-                className="[&_svg]:size-8"
+                className="[&_svg]:size-8 px-1"
               >
-                <Play size={40} className="cursor-pointer hover:text-lime-500" />
-              </Button>
-              <Button
-                variant="ghost"
-                size={"icon"}
-                className="[&_svg]:size-8"
-                onClick={handleLike}
-              >
-                <Heart
-                  className={isLiked ? "text-lime-500" : ""}
-                  fill={isLiked ? "currentColor" : "none"}
+                <Play
+                  size={40}
+                  className="cursor-pointer hover:text-lime-500"
                 />
               </Button>
+
               <Button
                 title="Compartilhar"
                 variant="ghost"
-                size={"icon"}
-                className="[&_svg]:size-8"
+
+                className="[&_svg]:size-8 px-1"
                 onClick={() => {
                   navigator.clipboard.writeText(
                     `${window.location.origin}/playlist/${playlist?.id}`
@@ -191,6 +183,17 @@ export default function Playlist() {
                 }}
               >
                 <Share2 />
+              </Button>
+              <Button
+                variant="ghost"
+                className="[&_svg]:size-8 px-1"
+                onClick={handleLike}
+              >
+                <Heart
+                  className={isLiked ? "text-lime-500" : ""}
+                  fill={isLiked ? "currentColor" : "none"}
+                />
+                <span className={isLiked ? "text-lime-500 text-2xl" : "text-2xl"}>{playlist?.likesCount}</span>
               </Button>
             </div>
           </div>
