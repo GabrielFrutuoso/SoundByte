@@ -13,6 +13,7 @@ type Playlist = {
     username: string;
   };
   songs: any[];
+  likesCount: number;
 }
 
 const fetchPlaylistById = async (id: string): Promise<Playlist> => {
