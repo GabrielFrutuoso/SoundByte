@@ -27,7 +27,7 @@ export interface PlaylistItemProps {
   isPrivate: boolean;
   user?: {
     id: string | undefined;
-    username: string;
+    username?: string;
   };
   variant?: string;
   isInMenu?: boolean;
