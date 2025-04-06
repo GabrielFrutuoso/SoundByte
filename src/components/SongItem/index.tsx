@@ -18,7 +18,7 @@ import { useDisikeSongs } from "@/hooks/requests/song/useDislikeSong";
 import { useLikeSongs } from "@/hooks/requests/song/useLikeSong";
 import { useGetLikedSongs } from "@/hooks/requests/likedSong/useGetLikedSongs";
 import { useAddSongToPlaylist } from "@/hooks/requests/playlist/useAddSongToPlaylist";
-import { useGetPlaylistsByUser } from "@/hooks/requests/playlist/useGetPlaylistsByUser/route";
+import { useGetPlaylistsByUser } from "@/hooks/requests/playlist/useGetPlaylistsByUser";
 import { useDeleteSongs } from "@/hooks/requests/song/useDeleteSong";
 import { DeleteDialog } from "../DeleteDialog";
 
@@ -134,7 +134,6 @@ export const SongItem = ({
           description={`tem certeza que quer deletar ${title}?`}
           onDelete={() => deleteSong({ songId: id })}
         />
-        
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem onClick={handleLike}>
