@@ -8,7 +8,7 @@ import { useUserStore } from "@/store/userStore";
 import React from "react";
 import { redirect } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useGetPlaylistsByUser } from "@/hooks/requests/playlist/useGetPlaylistsByUser/route";
+import { useGetPlaylistsByUser } from "@/hooks/requests/playlist/useGetPlaylistsByUser";
 import { useGetSongsByUser } from "@/hooks/requests/song/useGetSongsByUser";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlaylistItem } from "@/components/PlaylistItem";
@@ -82,6 +82,9 @@ export default function Settings() {
                       key={playlist.id}
                       id={playlist.id}
                       title={playlist.title}
+                      user={{
+                        id: playlist.userId,
+                      }}
                       bannerSrc={playlist.bannerSrc}
                       isPrivate={playlist.isPrivate}
                       songIndex={index}
