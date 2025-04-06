@@ -6,6 +6,12 @@ export async function GET(
   { params }: { params: { playlistId: string } }
 ) {
   try {
+    const likesCount = await prisma.likedPlaylist.count({
+      where: {
+        playlistId: params.playlistId,
+      },
+    });
+
     const playlist = await prisma.playlist.findUnique({
       where: {
         id: params.playlistId,
@@ -47,10 +53,9 @@ export async function GET(
         { status: 404 }
       );
     }
+    
 
-    console.log("Playlist data:", JSON.stringify(playlist, null, 2));
-
-    return NextResponse.json(playlist, { status: 200 });
+    return NextResponse.json({...playlist, likesCount}, { status: 200 });
   } catch (error) {
     console.error("Error fetching playlist:", error);
     return NextResponse.json(
