@@ -18,7 +18,9 @@ import { useDisikeSongs } from "@/hooks/requests/song/useDislikeSong";
 import { useLikeSongs } from "@/hooks/requests/song/useLikeSong";
 import { useGetLikedSongs } from "@/hooks/requests/likedSong/useGetLikedSongs";
 import { useAddSongToPlaylist } from "@/hooks/requests/playlist/useAddSongToPlaylist";
-import { useGetPlaylistsByUser } from "@/hooks/requests/playlist/useGetPlaylistsByUser/route";
+import { useGetPlaylistsByUser } from "@/hooks/requests/playlist/useGetPlaylistsByUser";
+import { useDeleteSongs } from "@/hooks/requests/song/useDeleteSong";
+import { DeleteDialog } from "../DeleteDialog";
 
 interface LikedSong {
   song: {
@@ -26,18 +28,25 @@ interface LikedSong {
   };
 }
 
-export const SongItem = ({ id, bannerSrc, title, artist }: SongItemProps) => {
+export const SongItem = ({
+  id,
+  bannerSrc,
+  title,
+  artist,
+  userUUID,
+}: SongItemProps) => {
   const { uuid, setUuid, setIndex } = usePlayerStore();
   const audioPlayer = useAudioPlayer();
   const isCurrentlyPlaying = audioPlayer.isPlaying && uuid === id;
   const { user: currentUser } = useUserStore();
   const [isLiked, setIsLiked] = useState(false);
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { data: likedSongs } = useGetLikedSongs(currentUser?.id || "");
   const { data: userPlaylists } = useGetPlaylistsByUser(currentUser?.id || "");
   const { mutate: likeSong } = useLikeSongs();
   const { mutate: dislikeSong } = useDisikeSongs();
   const { mutate: addSongToPlaylist } = useAddSongToPlaylist();
+  const { mutate: deleteSong } = useDeleteSongs();
 
   useEffect(() => {
     if (likedSongs) {
@@ -117,12 +126,24 @@ export const SongItem = ({ id, bannerSrc, title, artist }: SongItemProps) => {
             </p>
           </div>
         </div>
+
+        <DeleteDialog
+          isOpen={isDialogOpen}
+          onOpenChange={() => setIsDialogOpen(!isDialogOpen)}
+          title={"Deletar música"}
+          description={`tem certeza que quer deletar ${title}?`}
+          onDelete={() => deleteSong({ songId: id })}
+        />
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem onClick={handleLike}>
           {isLiked ? "Descurtir :(" : "Curtir <3"}
         </ContextMenuItem>
-
+        {currentUser?.id === userUUID && (
+          <ContextMenuItem onClick={() => setIsDialogOpen(true)}>
+            Deletar música
+          </ContextMenuItem>
+        )}
         <ContextMenuSub>
           <ContextMenuSubTrigger>
             <div className="flex items-center gap-2">

@@ -28,6 +28,7 @@ export default function Home() {
         avatar: data.avatar || "",
         likedPlaylists: data.likedPlaylists || [],
         likedSongs: data.likedSongs || [],
+        provider: data.provider || "",
       };
       setUser(userWithRequiredFields);
     }
@@ -43,6 +44,7 @@ export default function Home() {
                 <PlaylistItem
                   key={playlist.id}
                   {...playlist}
+                  user={playlist.user || undefined}
                   isPrivate={false}
                   isInMenu={true}
                   variant="menu"

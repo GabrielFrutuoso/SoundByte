@@ -19,6 +19,7 @@ export async function GET(request: Request) {
         username: true,
         email: true,
         avatar: true,
+        provider: true,
         createdAt: true,
         updatedAt: true,
         likedPlaylists: {

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { baseStyle, baseStyleProps } from "./style";
 import { Pause, Play } from "lucide-react";
@@ -17,12 +17,18 @@ import { useDisikePlaylist } from "@/hooks/requests/playlist/useDislikePlaylist"
 import { useLikePlaylist } from "@/hooks/requests/playlist/useLikePlaylist";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { usePlayerStore } from "@/store/playlistStore";
+import { useDeletePlaylist } from "@/hooks/requests/playlist/useDeletePlailist";
+import { DeleteDialog } from "../DeleteDialog";
 
 export interface PlaylistItemProps {
   id: string;
   title: string;
   bannerSrc: string;
   isPrivate: boolean;
+  user?: {
+    id: string | undefined;
+    username?: string;
+  };
   variant?: string;
   isInMenu?: boolean;
   songIndex: number;
@@ -33,6 +39,7 @@ export const PlaylistItem = ({
   id,
   title,
   bannerSrc,
+  user,
   variant,
   isInMenu,
   isCollapsed,
@@ -48,6 +55,8 @@ export const PlaylistItem = ({
 
   const { mutate: likePlaylist } = useLikePlaylist();
   const { mutate: disLikePlaylist } = useDisikePlaylist();
+  const { mutate: deletePlaylist } = useDeletePlaylist();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleLike = async () => {
     const likedPlaylists = currentUser?.likedPlaylists;
@@ -112,6 +121,14 @@ export const PlaylistItem = ({
           </Link>
         )}
       </div>
+      
+      <DeleteDialog
+        isOpen={isDialogOpen}
+        onOpenChange={() => setIsDialogOpen(!isDialogOpen)}
+        title={"Deletar playlist"}
+        description={`tem certeza que quer deletar ${title}?`}
+        onDelete={() => deletePlaylist(id)}
+      />
 
       <ContextMenuContent>
         <ContextMenuItem
@@ -126,6 +143,11 @@ export const PlaylistItem = ({
         >
           Compartilhar
         </ContextMenuItem>
+        {currentUser?.id === user?.id && (
+          <ContextMenuItem onClick={() => setIsDialogOpen(true)}>
+            Deletar playlist
+          </ContextMenuItem>
+        )}
         <ContextMenuItem onClick={handleLike}>
           {currentUser?.likedPlaylists?.some(
             (likedPlaylist) => likedPlaylist.playlist.id === id
