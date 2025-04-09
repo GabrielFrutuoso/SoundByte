@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Music, ListMusic, Upload } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -15,11 +15,15 @@ import { PlaylistItem } from "@/components/PlaylistItem";
 import { SongItem } from "@/components/SongItem";
 import { PlaylistItemSkeleton } from "@/components/PlaylistItem/Skeleton";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
+import Image from "next/image";
 
 export default function Settings() {
   const { user } = useUserStore();
-  const { data: playlists, isLoading: isLoadingPlaylists } = useGetPlaylistsByUser(user?.id || "");
-  const { data: songs, isLoading: isLoadingSongs } = useGetSongsByUser(user?.id || "");
+  const { data: playlists, isLoading: isLoadingPlaylists } =
+    useGetPlaylistsByUser(user?.id || "");
+  const { data: songs, isLoading: isLoadingSongs } = useGetSongsByUser(
+    user?.id || ""
+  );
 
   if (!user) {
     return redirect("/");
@@ -33,12 +37,20 @@ export default function Settings() {
         <Separator className="my-6" orientation="horizontal" />
 
         <div className="flex items-center justify-start gap-4 mb-8">
-          <Avatar className="w-40 h-40">
-            <AvatarImage alt="Avatar" src={user?.avatar || ""} />
-            <AvatarFallback>
-              {user?.username?.substring(0, 2).toUpperCase() || "U"}
-            </AvatarFallback>
-          </Avatar>
+          {user?.avatar && (
+            <Avatar className="w-40 h-40">
+              <Image
+                width={160}
+                height={160}
+                alt="Avatar"
+                src={user?.avatar || ""}
+              />
+              <AvatarFallback>
+                {user?.username?.substring(0, 2).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
+          )}
+
           <div className="flex flex-col items-start justify-start gap-2">
             <h3 className="text-4xl font-bold">{user?.username}</h3>
             <p className="text-lg">{user?.email}</p>
@@ -115,7 +127,10 @@ export default function Settings() {
               {isLoadingSongs ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {Array.from({ length: 4 }).map((_, index) => (
-                    <div key={index} className="flex flex-col gap-2 p-4 rounded-md bg-zinc-900/50">
+                    <div
+                      key={index}
+                      className="flex flex-col gap-2 p-4 rounded-md bg-zinc-900/50"
+                    >
                       <div className="w-full aspect-square bg-zinc-800 rounded-md animate-pulse" />
                       <div className="h-4 w-3/4 bg-zinc-800 rounded animate-pulse" />
                       <div className="h-3 w-1/2 bg-zinc-800 rounded animate-pulse" />
@@ -125,10 +140,7 @@ export default function Settings() {
               ) : songs && songs.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {songs.map((song) => (
-                    <SongItem
-                      key={song.id}
-                      {...song}
-                    />
+                    <SongItem key={song.id} {...song} />
                   ))}
                 </div>
               ) : (
