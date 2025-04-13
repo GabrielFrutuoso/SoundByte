@@ -16,12 +16,14 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
+import { useGetGenre } from "@/hooks/requests/genre/useGetGenre";
 
 export default function Search() {
   const [type, setType] = useState("song");
   const [query] = useQueryState("query");
   const [page, setPage] = useQueryState("page");
   const [genre] = useQueryState("genre");
+  const { data: genreData } = useGetGenre();
 
   useEffect(() => {
     setType("song");
@@ -53,6 +55,9 @@ export default function Search() {
     }
   }, [error]);
 
+  console.log(genreData);
+  
+
   return (
     <div className="h-full flex flex-col pb-4">
       <div className="w-full flex flex-col sm:flex-row justify-between gap-4 p-4 border-b border-zinc-800">
@@ -75,10 +80,14 @@ export default function Search() {
             Playlists
           </Button>
           <Separator orientation="vertical" className="hidden sm:block" />
-          <Select >
+          <Select>
             <SelectTrigger className="w-[180px]">Genero</SelectTrigger>
             <SelectContent>
-              <SelectItem value="apple">rock</SelectItem>
+              {genreData?.map((item) => (
+                <SelectItem key={item.id} value={item.id}>
+                  {item.title}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           {query && (
