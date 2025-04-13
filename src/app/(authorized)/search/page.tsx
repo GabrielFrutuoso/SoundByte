@@ -10,11 +10,20 @@ import { Separator } from "@/components/ui/separator";
 import { Pagination } from "@/components/Pagination";
 import { SearchResultSkeleton } from "@/components/SearchResultItem/Skeleton";
 import { toast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { useGetGenre } from "@/hooks/requests/genre/useGetGenre";
 
 export default function Search() {
   const [type, setType] = useState("song");
   const [query] = useQueryState("query");
   const [page, setPage] = useQueryState("page");
+  const [genre] = useQueryState("genre");
+  const { data: genreData } = useGetGenre();
 
   useEffect(() => {
     setType("song");
@@ -24,9 +33,13 @@ export default function Search() {
     data: result,
     isLoading,
     error,
-  } = useSearch(query || "", type || "song", Number(page || 1), 12);
-
-  console.log(result?.data);
+  } = useSearch({
+    query: query || "",
+    genre: genre || "",
+    type: type || "song",
+    page: Number(page || 1),
+    pageSize: 10,
+  });
 
   const handlePageChange = (newPage: number) => {
     setPage(String(newPage));
@@ -41,6 +54,9 @@ export default function Search() {
       });
     }
   }, [error]);
+
+  console.log(genreData);
+  
 
   return (
     <div className="h-full flex flex-col pb-4">
@@ -63,6 +79,17 @@ export default function Search() {
           >
             Playlists
           </Button>
+          <Separator orientation="vertical" className="hidden sm:block" />
+          <Select>
+            <SelectTrigger className="w-[180px]">Genero</SelectTrigger>
+            <SelectContent>
+              {genreData?.map((item) => (
+                <SelectItem key={item.id} value={item.id}>
+                  {item.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {query && (
             <>
               <Separator orientation="vertical" className="hidden sm:block" />
@@ -79,7 +106,6 @@ export default function Search() {
         />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-7 p-4 sm:p-12">
-
         {result?.data?.songs &&
           result?.data?.songs?.map((item: SearchResultType) => (
             <SearchResultItem key={item?.id} result={item} type={"song"} />
