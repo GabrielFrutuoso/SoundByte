@@ -7,7 +7,7 @@ import { Search } from "lucide-react";
 import { AddSongDialog } from "../AddSongDialog";
 import { signOut } from "next-auth/react";
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Menubar,
@@ -18,10 +18,13 @@ import {
 } from "../ui/menubar";
 import { useUserStore } from "@/store/userStore";
 import Image from "next/image";
+import { useQueryState } from "nuqs";
 
 export const Header = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useUserStore();
+  const [query, setQuery] = useQueryState("query");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,6 +32,14 @@ export const Header = () => {
     const query = formData.get("query");
     router.push(`/search?query=${query}`);
   };
+
+  const changeQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (pathname === "/search") {
+      setQuery(e.target.value);
+    }
+  };
+  console.log("query", query);
+  
   return (
     <header className="flex items-center justify-between py-2 px-12 border-b border-zinc-800">
       <Link href={"/"}>
@@ -43,6 +54,7 @@ export const Header = () => {
             className="absolute top-1/2 left-2 -translate-y-1/2"
           />
           <Input
+            onChange={changeQuery}
             className="bg-zinc-900/50 pl-8"
             type="text"
             placeholder="Pesquisar"
