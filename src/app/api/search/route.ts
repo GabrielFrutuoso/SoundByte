@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/PrismaClient";
-import {  } from "@prisma/client";
+import {} from "@prisma/client";
 import { NextResponse } from "next/server";
-
 
 export async function GET(request: Request) {
   try {
@@ -35,13 +34,7 @@ export async function GET(request: Request) {
                 ],
               },
               {
-                genre: genre
-                  ? {
-                      title: {
-                        contains: genre,
-                      },
-                    }
-                  : undefined,
+                genre: genre ? { id: parseInt(genre) } : undefined,
               },
             ],
           },
@@ -81,7 +74,10 @@ export async function GET(request: Request) {
           },
         });
         const totalPages = Math.ceil(totalItems / pageSize);
-        return NextResponse.json({ songs, totalItems, totalPages }, { status: 200 });
+        return NextResponse.json(
+          { songs, totalItems, totalPages },
+          { status: 200 }
+        );
 
       case "playlist":
         const playlists = await prisma.playlist.findMany({
@@ -111,7 +107,10 @@ export async function GET(request: Request) {
           },
         });
         const totalPlaylistPages = Math.ceil(totalPlaylistItems / pageSize);
-        return NextResponse.json({ playlists, totalPlaylistItems, totalPlaylistPages }, { status: 200 });
+        return NextResponse.json(
+          { playlists, totalPlaylistItems, totalPlaylistPages },
+          { status: 200 }
+        );
     }
   } catch (err) {
     console.error(err);
