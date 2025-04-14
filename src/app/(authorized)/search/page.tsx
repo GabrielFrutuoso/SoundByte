@@ -15,6 +15,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { useGetGenre } from "@/hooks/requests/genre/useGetGenre";
 
@@ -22,7 +23,7 @@ export default function Search() {
   const [type, setType] = useState("song");
   const [query] = useQueryState("query");
   const [page, setPage] = useQueryState("page");
-  const [genre] = useQueryState("genre");
+  const [genre, setGenre] = useState("");
   const { data: genreData } = useGetGenre();
 
   useEffect(() => {
@@ -55,8 +56,7 @@ export default function Search() {
     }
   }, [error]);
 
-  console.log(genreData);
-  
+  console.log(genre);
 
   return (
     <div className="h-full flex flex-col pb-4">
@@ -80,8 +80,10 @@ export default function Search() {
             Playlists
           </Button>
           <Separator orientation="vertical" className="hidden sm:block" />
-          <Select>
-            <SelectTrigger className="w-[180px]">Genero</SelectTrigger>
+          <Select onValueChange={(value) => setGenre(value)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Gênero" />
+            </SelectTrigger>
             <SelectContent>
               {genreData?.map((item) => (
                 <SelectItem key={item.id} value={item.id}>
@@ -93,9 +95,12 @@ export default function Search() {
           {query && (
             <>
               <Separator orientation="vertical" className="hidden sm:block" />
-              <h1 className="text-xl font-bold w-full sm:w-auto">
-                Resultados para: <span className="text-lime-500">{query}</span>
-              </h1>
+              <div className="flex flex-col sm:flex-row gap-2 items-center">
+                <h3 className="text-md font-bold w-full sm:w-auto">
+                  Resultados para:{" "}
+                  <span className="text-lime-500 text-xl">{query}</span>
+                </h3>
+              </div>
             </>
           )}
         </div>
