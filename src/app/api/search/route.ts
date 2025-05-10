@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/PrismaClient";
-import {  } from "@prisma/client";
+import {} from "@prisma/client";
 import { NextResponse } from "next/server";
-
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q") || "";
+    const genre = searchParams.get("genre") || "";
     const type = searchParams.get("type") || "";
     const page = parseInt(searchParams.get("page") || "1");
     const pageSize = parseInt(searchParams.get("pageSize") || "10");
@@ -18,23 +18,23 @@ export async function GET(request: Request) {
         const songs = await prisma.song.findMany({
           where: {
             isPrivate: false,
-            OR: [
+            AND: [
               {
-                title: {
-                  contains: query,
-                },
-              },
-              {
-                artist: {
-                  contains: query,
-                },
-              },
-              {
-                genre: {
-                  title: {
-                    contains: query,
+                OR: [
+                  {
+                    title: {
+                      contains: query,
+                    },
                   },
-                },
+                  {
+                    artist: {
+                      contains: query,
+                    },
+                  },
+                ],
+              },
+              {
+                genre: genre ? { id: parseInt(genre) } : undefined,
               },
             ],
           },
@@ -74,7 +74,11 @@ export async function GET(request: Request) {
           },
         });
         const totalPages = Math.ceil(totalItems / pageSize);
-        return NextResponse.json({ songs, totalItems, totalPages }, { status: 200 });
+        return NextResponse.json(
+          { songs, totalItems, totalPages },
+          { status: 200 }
+        );
+
       case "playlist":
         const playlists = await prisma.playlist.findMany({
           where: {
@@ -103,7 +107,10 @@ export async function GET(request: Request) {
           },
         });
         const totalPlaylistPages = Math.ceil(totalPlaylistItems / pageSize);
-        return NextResponse.json({ playlists, totalPlaylistItems, totalPlaylistPages }, { status: 200 });
+        return NextResponse.json(
+          { playlists, totalPlaylistItems, totalPlaylistPages },
+          { status: 200 }
+        );
     }
   } catch (err) {
     console.error(err);
